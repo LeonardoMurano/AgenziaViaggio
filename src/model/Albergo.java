@@ -7,7 +7,7 @@ public class Albergo {
 
     //attributi classe Albergo
 
-    private final String nomeAlbergo; //PK
+    private final String nomeAlbergo;
     private String referente;
     private BigDecimal costoNotteOspite;
     private int numeroMassimoOspiti;
@@ -15,7 +15,7 @@ public class Albergo {
     private String telefono;
     private String fax;
     private String email;
-    private final Citta citta; //PK; FK verso Citta
+    private final Citta citta;
 
 
     //costruttore per la creazione di nuovi oggetti 'Albergo' e il mapping dal resultSet

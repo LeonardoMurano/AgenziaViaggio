@@ -1,11 +1,40 @@
 package model;
 
+import model.enums.Ruolo;
+
 public class Utente {
 
-    private String codiceFiscale; //PK
+
+    //attributi classe Utente
+
+    private final String codiceFiscale;
     private String nomeUtente;
     private String cognomeUtente;
     private String password;
-    private String ruolo; // "Cliente" o "Agente"
+    private Ruolo ruolo;
 
+
+    //costruttore per la creazione di nuovi oggetti 'Utente' e il mapping dal resultSet
+
+    public Utente(String codiceFiscale,
+                  String nomeUtente,
+                  String cognomeUtente,
+                  String password,
+                  Ruolo ruolo) {
+
+        this.codiceFiscale = codiceFiscale;
+        this.nomeUtente = nomeUtente;
+        this.cognomeUtente = cognomeUtente;
+        this.password = password;
+        this.ruolo = ruolo;
+    }
+
+
+    //operazioni di get
+
+    public String getCodiceFiscale() {return codiceFiscale;}
+    public String getNomeUtente() {return nomeUtente;}
+    public String getCognomeUtente() {return cognomeUtente;}
+    public String getPassword() {return password;}
+    public Ruolo getRuolo() {return ruolo;}
 }
