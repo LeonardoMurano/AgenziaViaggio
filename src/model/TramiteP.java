@@ -1,14 +1,25 @@
 package model;
 
-import java.time.LocalDate;
-
 public class TramiteP {
 
-    //PK; FK verso EdizioneViaggioPassata
-    private LocalDate partenza;
-    private String itinerario;
 
-    //PK; FK verso AutobusAgenzia
-    private int idMezzo;
+    //attributi classe TramiteP
 
+    private EdizioneViaggioPassata edizioneViaggioPassata;
+    private AutobusAgenzia autobusAgenzia;
+
+
+    //costruttore per la creazione di nuovi oggetti 'TramiteP' e il mapping dal resultSet
+
+    public TramiteP(EdizioneViaggioPassata edizioneViaggioPassata,
+                    AutobusAgenzia autobusAgenzia) {
+        this.edizioneViaggioPassata = edizioneViaggioPassata;
+        this.autobusAgenzia = autobusAgenzia;
+    }
+
+
+    //operazioni di get
+
+    public EdizioneViaggioPassata getEdizioneViaggioPassata() {return edizioneViaggioPassata;}
+    public AutobusAgenzia getAutobusAgenzia() {return autobusAgenzia;}
 }

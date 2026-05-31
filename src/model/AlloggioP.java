@@ -1,19 +1,29 @@
 package model;
 
-import java.time.LocalDate;
-
 public class AlloggioP {
 
-    //PK; FK verso EdizioneViaggioPassata
-    private LocalDate edizioneViaggio;
-    private String itinerarioViaggio;
 
-    //PK; FK verso TappaNotturna
-    private int tappaNotturna;
-    private String itinerarioTappa;
+    //attributi classe AlloggioP
 
-    //FK verso Albergo
-    private String nomeAlbergo;
-    private String citta;
+    private final EdizioneViaggioPassata edizioneViaggioPassata;
+    private final TappaNotturna tappaNotturna;
+    private Albergo albergo;
 
+
+    //costruttore per la creazione di nuovi oggetti 'AlloggioP' e il mapping dal resultSet
+
+    public AlloggioP(EdizioneViaggioPassata edizioneViaggioPassata,
+                     TappaNotturna tappaNotturna,
+                     Albergo albergo) {
+        this.edizioneViaggioPassata = edizioneViaggioPassata;
+        this.tappaNotturna = tappaNotturna;
+        this.albergo = albergo;
+    }
+
+
+    //operazioni di get
+
+    public EdizioneViaggioPassata getEdizioneViaggioPassata() {return edizioneViaggioPassata;}
+    public TappaNotturna getTappaNotturna() {return tappaNotturna;}
+    public Albergo getAlbergo() {return albergo;}
 }

@@ -7,7 +7,7 @@ public class AutobusAgenzia {
 
     //attributi classe AutobusAgenzia
 
-    private int idMezzo; //PK
+    private int idMezzo;
     private BigDecimal costoMezzo;
     private int capienza;
 

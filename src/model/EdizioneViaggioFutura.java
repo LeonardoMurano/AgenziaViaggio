@@ -7,11 +7,11 @@ public class EdizioneViaggioFutura {
 
     //attributi classe EdizioneViaggioFutura
 
-    private LocalDate partenza;
+    private final LocalDate partenza;
     private LocalDate rientro;
     private int numeroOspitiTotale;
     private BigDecimal costoOperativo;
-    private Itinerario itinerario;
+    private final Itinerario itinerario;
 
 
     //costruttore per la creazione di nuovi oggetti 'Itinerario'
