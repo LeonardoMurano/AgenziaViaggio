@@ -1,6 +1,4 @@
-package model;
-
-import java.time.LocalDate;
+package model.domain;
 
 public class Prenotazione {
 

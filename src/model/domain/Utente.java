@@ -1,4 +1,4 @@
-package model;
+package model.domain;
 
 import model.enums.Ruolo;
 
