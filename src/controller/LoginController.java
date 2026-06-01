@@ -5,7 +5,8 @@ package controller;
 import java.io.IOException;
 
 import exception.DAOException;
-import model.dao.LoginProcedureDAO;
+import model.dao.LoginProceduraDAO;
+import model.dao.LoginProceduraDAO;
 import model.domain.Utente;
 import view.LoginView;
 import model.dto.LoginRequest;
@@ -33,7 +34,7 @@ public class LoginController implements Controller {
 
         //esecuzione procedura di login
         try {
-            cred = new LoginProcedureDAO().execute(loginRequest);
+            cred = new LoginProceduraDAO().execute(loginRequest);
         } catch(DAOException e) {
             throw new RuntimeException(e);
         }

@@ -14,7 +14,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Types;
 
-public class LoginProcedureDAO implements GenericaProceduraDAO<LoginRequest, Utente> {
+public class LoginProceduraDAO implements GenericaProceduraDAO<LoginRequest, Utente> {
 
     @Override
     public Utente execute(LoginRequest input) throws DAOException {
