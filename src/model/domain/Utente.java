@@ -30,6 +30,20 @@ public class Utente {
     }
 
 
+    //costruttore per la creazione di nuovi oggetti 'Utente' in fase di login
+
+    public Utente(String codiceFiscale,
+                  String password,
+                  Ruolo ruolo) {
+
+        this.codiceFiscale = codiceFiscale;
+        this.password = password;
+        this.ruolo = ruolo;
+        this.nomeUtente = null;
+        this.cognomeUtente = null;
+    }
+
+
     //operazioni di get
 
     public String getCodiceFiscale() {return codiceFiscale;}
