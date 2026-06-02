@@ -37,8 +37,8 @@ public class ApplicationController implements Controller {
 
             //crea e avvia l'opportuno controller, in base al ruolo dell'utente
 
-            case CLIENTE -> new AgenziaController().start();
-            case AGENTE -> new AmministratoreController().start();
+            case CLIENTE -> new ClienteController().start();
+            case AGENTE -> new AgenteController().start();
             default -> throw new RuntimeException("Invalid credentials");
         }
     }
