@@ -29,6 +29,7 @@ public class ApplicationController implements Controller {
         //verifica validità credenziali
         if(cred.getRuolo() == null) {
             System.out.println("Accesso negato");
+            return;
         }
 
 
