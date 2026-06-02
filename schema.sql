@@ -471,18 +471,31 @@ INSERT INTO EdizioneViaggioPassata VALUES
 INSERT INTO TappaNotturna VALUES
 (1,2,'ItaliaNord','Milano'),
 (2,2,'ItaliaNord','Torino'),
+
 (1,1,'ItaliaSud','Napoli'),
+
 (1,1,'ArteToscana','Firenze'),
+
 (1,1,'LaghiNord','Verona'),
+
 (1,1,'CittaVenete','Venezia'),
+
 (1,1,'SiciliaTour','Palermo'),
+
 (1,1,'RomaClassica','Roma'),
+
 (1,1,'Costiera','Napoli'),
+
 (1,1,'FoodTour','Parma'),
+
 (1,1,'MareAdriatico','Bari'),
+
 (1,1,'MareTirreno','Genova'),
+
 (1,1,'Dolomiti','Verona'),
+
 (1,1,'PugliaTour','Lecce'),
+
 (1,1,'EmiliaRomagna','Bologna');
 
 INSERT INTO Albergo VALUES

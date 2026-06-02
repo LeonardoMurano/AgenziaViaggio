@@ -28,7 +28,7 @@ public class ApplicationController implements Controller {
 
         //verifica validità credenziali
         if(cred.getRuolo() == null) {
-            throw new RuntimeException("Invalid credentials");
+            System.out.println("Accesso negato");
         }
 
 

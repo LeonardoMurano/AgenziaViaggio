@@ -35,8 +35,9 @@ public class LoginController implements Controller {
         //esecuzione procedura di login
         try {
             cred = new LoginProceduraDAO().execute(loginRequest);
+            //gestione errore credenziali non valide
         } catch(DAOException e) {
-            throw new RuntimeException(e);
+            System.out.println("Credenziali non valide");
         }
     }
 
