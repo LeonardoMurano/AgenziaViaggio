@@ -3,6 +3,11 @@
  */
 package view;
 
+import model.domain.Utente;
+import model.dto.RegistraItinerarioRequest;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
 public class ClienteView {
@@ -60,4 +65,40 @@ public class ClienteView {
 
 
     //definire una funzione per ogni operazione su cui Cliente ha grant
+
+    public RegistraItinerarioRequest richiediRegistraPrenotazione(Utente cred){
+
+        //richiesta in input delle informazioni inerenti la prenotazione da registrare
+        Scanner input = new Scanner(System.in);
+        System.out.print("OPERAZIONE DI REGISTRAZIONE PRENOTAZIONE");
+        System.out.print("Itinerario: ");
+        String itinerario = input.nextLine();
+        System.out.print("Data di partenza (yyyy-MM-dd): ");
+        String stringDataPartenza = input.nextLine();
+        System.out.print("Numero di ospiti per cui si effettua la prenotazione: ");
+        String stringNumeroOspitiPrenotazione = input.nextLine();
+
+        //estrazione dello username del Cliente da cred
+        String username = cred.getUsername();
+
+        try{
+            //conversione formato String->LocalDate
+            LocalDate dataPartenza = LocalDate.parse(stringDataPartenza);
+            //conversione formato String->int
+            int numeroOspitiPrenotazione = Integer.parseInt(stringNumeroOspitiPrenotazione);
+
+            //restituzione riferimento alla nuova istanza di record di RegistraItinerarioRequest
+            return new RegistraItinerarioRequest(numeroOspitiPrenotazione,username, dataPartenza, itinerario);
+
+        } catch (DateTimeParseException e) {
+            //gestione errore dovuto a formato della data di partenza non valido
+            System.out.println("Formato della data non valido. Utilizzare yyyy-MM-dd.\n");
+            return null;
+        } catch (NumberFormatException e) {
+            //gestione errore dovuto a formato del numero di ospiti non valido
+            System.out.println("Formato del numero di ospiti non valido. Utilizzare un valore numerico intero.\n");
+            return null;
+        }
+    }
+
 }

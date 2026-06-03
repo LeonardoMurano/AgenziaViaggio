@@ -30,7 +30,7 @@ public class LoginController implements Controller {
         }
 
         //costruzione del record di LoginRequest
-        LoginRequest loginRequest = new LoginRequest(cred.getCodiceFiscale(), cred.getPassword());
+        LoginRequest loginRequest = new LoginRequest(cred.getUsername(), cred.getPassword());
 
         //esecuzione procedura di login
         try {

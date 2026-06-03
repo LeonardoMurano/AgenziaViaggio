@@ -7,7 +7,7 @@ public class Utente {
 
     //attributi classe Utente
 
-    private final String codiceFiscale;
+    private final String username;
     private String nomeUtente;
     private String cognomeUtente;
     private String password;
@@ -16,13 +16,13 @@ public class Utente {
 
     //costruttore per la creazione di nuovi oggetti 'Utente' e il mapping dal resultSet
 
-    public Utente(String codiceFiscale,
+    public Utente(String username,
                   String nomeUtente,
                   String cognomeUtente,
                   String password,
                   Ruolo ruolo) {
 
-        this.codiceFiscale = codiceFiscale;
+        this.username = username;
         this.nomeUtente = nomeUtente;
         this.cognomeUtente = cognomeUtente;
         this.password = password;
@@ -32,11 +32,11 @@ public class Utente {
 
     //costruttore per la creazione di nuovi oggetti 'Utente' in fase di login
 
-    public Utente(String codiceFiscale,
+    public Utente(String username,
                   String password,
                   Ruolo ruolo) {
 
-        this.codiceFiscale = codiceFiscale;
+        this.username = username;
         this.password = password;
         this.ruolo = ruolo;
         this.nomeUtente = null;
@@ -46,7 +46,7 @@ public class Utente {
 
     //operazioni di get
 
-    public String getCodiceFiscale() {return codiceFiscale;}
+    public String getUsername() {return username;}
     public String getNomeUtente() {return nomeUtente;}
     public String getCognomeUtente() {return cognomeUtente;}
     public String getPassword() {return password;}

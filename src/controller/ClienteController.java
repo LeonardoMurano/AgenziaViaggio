@@ -6,6 +6,9 @@ package controller;
 import exception.ApplicationException;
 import exception.ControllerException;
 import model.dao.ConnectionFactory;
+import model.dao.RegistraPrenotazioneProceduraDAO;
+import model.domain.Utente;
+import model.dto.RegistraItinerarioRequest;
 import view.ClienteView;
 import model.enums.Ruolo;
 
@@ -13,8 +16,19 @@ import java.sql.SQLException;
 
 public class ClienteController implements Controller {
 
-    //creazione istanza di ClienteView
+    //DICHIARAZIONE ATTRIBUTO IN CUI SONO MEMORIZZATE LE CREDENZIALI DI Cliente (Username; Password)
+    //necessario perchè le operazioni su cui Cliente possiede grant
+    //richiedono di tenere traccia del Cliente che le esegue
+    Utente cred;
+
+    //creazione istanza di ClienteView e memorizzazione del suo riferimento in 'view'
     private final ClienteView view = new ClienteView();
+
+
+    //COSTRUTTORE DELLA CLASSE ClienteController
+    public ClienteController(Utente cred) {
+        this.cred = cred;
+    }
 
 
     //FUNZIONE DI AVVIO DEL ClienteController
@@ -51,7 +65,24 @@ public class ClienteController implements Controller {
     }
 
 
-//definire una funzione per ogni operazione di Cliente inserita nello switch
-    void  registraPrenotazione() throws ControllerException {}
+//DEFINIZIONE DI UNA FUNZIONE PER IL CONTROLLO DELL'ESECUZIONE DI OGNI OPERAZIONE SU CUI CLIENTE HA GRANT
+
+
+
+    private void  registraPrenotazione() throws ControllerException {
+
+        //invoca ClienteView per richiede i dati in input al Cliente
+        RegistraItinerarioRequest request = view.richiediRegistraPrenotazione(cred);
+
+        //verifica che la richiesta sia andata a buon fine
+        if (request == null) {return;}
+
+        try{
+            int idPrenotazione = new RegistraPrenotazioneProceduraDAO().execute(request);
+        }
+    }
+
+
+
     void  cancellaPrenotazione() throws ControllerException {}
 }
