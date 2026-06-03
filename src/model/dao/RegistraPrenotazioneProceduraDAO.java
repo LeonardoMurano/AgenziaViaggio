@@ -24,18 +24,16 @@ public class RegistraPrenotazioneProceduraDAO {
             //preparazione connessione
             Connection conn = ConnectionFactory.getConnection();
             //preparazione ed esecuzione stored procedure 'registraPrenotazione'
-            CallableStatement cs = conn.prepareCall("{call registraPrenotazione(?,?,?,?,?,?,?)}");
+            CallableStatement cs = conn.prepareCall("{call registraPrenotazione(?,?,?,?,?)}");
             cs.setInt(1, numeroOspitiprenotazione);
-            cs.setString(2, username);
-            cs.setNull(3, Types.DATE);
-            cs.setNull(4, Types.VARCHAR);
-            cs.setDate(5, Date.valueOf(dataPartenza));
-            cs.setString(6, itinerario);
-            cs.registerOutParameter(7, Types.INTEGER);
+            cs.setString(2, username);;
+            cs.setDate(3, Date.valueOf(dataPartenza));
+            cs.setString(4, itinerario);
+            cs.registerOutParameter(5, Types.INTEGER);
             cs.executeQuery();
 
             //estrazione output della stored procedure 'registraPrenotazione'
-            idPrenotazione = cs.getInt(7);
+            idPrenotazione = cs.getInt(5);
 
 
         } catch (SQLException e) {

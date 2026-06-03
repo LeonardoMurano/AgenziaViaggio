@@ -4,7 +4,7 @@
 package view;
 
 import model.domain.Utente;
-import model.dto.RegistraItinerarioRequest;
+import model.dto.RegistraPrenotazioneRequest;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -64,9 +64,9 @@ public class ClienteView {
 
 
 
-    //definire una funzione per ogni operazione su cui Cliente ha grant
+    //FUNZIONI VIEW RELATIVE OPERAZIONE: CL1 - RegistraItinerario
 
-    public RegistraItinerarioRequest richiediRegistraPrenotazione(Utente cred){
+    public RegistraPrenotazioneRequest richiediRegistraPrenotazione(Utente cred){
 
         //richiesta in input delle informazioni inerenti la prenotazione da registrare
         Scanner input = new Scanner(System.in);
@@ -88,7 +88,7 @@ public class ClienteView {
             int numeroOspitiPrenotazione = Integer.parseInt(stringNumeroOspitiPrenotazione);
 
             //restituzione riferimento alla nuova istanza di record di RegistraItinerarioRequest
-            return new RegistraItinerarioRequest(numeroOspitiPrenotazione,username, dataPartenza, itinerario);
+            return new RegistraPrenotazioneRequest(numeroOspitiPrenotazione,username, dataPartenza, itinerario);
 
         } catch (DateTimeParseException e) {
             //gestione errore dovuto a formato della data di partenza non valido
@@ -100,5 +100,18 @@ public class ClienteView {
             return null;
         }
     }
+
+    public void visualizzaIdPrenotazione(int idPrenotazione){
+
+        //stampa a schermo idPrenotazione generato come risultato dell'operazione registraPrenotazione
+        System.out.println("Registrazione prenotazione completata.\n");
+        System.out.println("ID prenotazione: " + idPrenotazione);
+        System.out.println("*********************************\n");
+        System.out.println("è possibile disdire la prenotazione:\n");
+        System.out.println("- 20 giorni prima della partenza;\n");
+        System.out.println("- utilizzando l'ID della prenotazione.");
+    }
+
+
 
 }

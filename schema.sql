@@ -350,6 +350,50 @@ DELIMITER ;
 
 
 -- -----------------------------------------------------
+-- stored procedure `AgenziaViaggio`.`registraPrenotazione`
+-- -----------------------------------------------------
+
+DELIMITER $$
+
+CREATE PROCEDURE registraPrenotazione(
+    IN p_numeroOspiti INT,
+    IN p_username VARCHAR(16),
+    IN p_partenzaF DATE,
+    IN p_itinerarioF VARCHAR(100),
+    OUT p_idPrenotazione INT
+)
+BEGIN
+
+    -- inserisce in Prenotazione la tupla definita dai valori in input:
+    -- una nuova prenotazione deve sempre riferirsi ad una EdizioneViaggioFutura dunque si forzano PartenzaP, ItinerarioP a NULL
+    -- idPrenotazione è autogenerato: viene omesso nell'INSERT
+    INSERT INTO Prenotazione (
+        NumeroOspitiPrenotazione,
+        InfoCliente,
+        PartenzaP,
+        ItinerarioP,
+        PartenzaF,
+        ItinerarioF
+    )
+    VALUES (
+        p_numeroOspiti,
+        p_username,
+        NULL,
+        NULL,
+        p_partenzaF,
+        p_itinerarioF
+    );
+
+    -- ritorna al chiamante idPrenotazione che è autogenerato nella BD
+    -- LAST_INSERT_ID() è specifico della connessione corrente: non è necessario implementare una transazione
+    SET p_idPrenotazione = LAST_INSERT_ID();
+
+END$$
+
+DELIMITER ;
+
+
+-- -----------------------------------------------------
 -- USERS AND PRIVILEGES
 -- -----------------------------------------------------
 DROP USER IF EXISTS 'login';
