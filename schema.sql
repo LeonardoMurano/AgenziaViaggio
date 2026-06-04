@@ -19,7 +19,7 @@ USE `AgenziaViaggio` ;
 -- Table `AgenziaViaggio`.`Utente`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`Utente` (
-                                                         `Username` VARCHAR(16) NOT NULL,
+    `Username` VARCHAR(16) NOT NULL,
     `NomeUtente` VARCHAR(100) NOT NULL,
     `CognomeUtente` VARCHAR(100) NOT NULL,
     `Password` VARCHAR(100) NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`Utente` (
 -- Table `AgenziaViaggio`.`Itinerario`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`Itinerario` (
-                                                             `Nome` VARCHAR(100) NOT NULL,
+    `Nome` VARCHAR(100) NOT NULL,
     `CostoItinerario` DECIMAL(10,2) UNSIGNED NOT NULL,
     PRIMARY KEY (`Nome`))
     ENGINE = InnoDB;
@@ -42,10 +42,10 @@ CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`Itinerario` (
 -- Table `AgenziaViaggio`.`EdizioneViaggioPassata`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`EdizioneViaggioPassata` (
-                                                                         `Partenza` DATE NOT NULL,
-                                                                         `Rientro` DATE NOT NULL,
-                                                                         `NumeroOspitiTotale` INT UNSIGNED NOT NULL,
-                                                                         `CostoOperativo` DECIMAL(10,2) UNSIGNED NOT NULL,
+    `Partenza` DATE NOT NULL,
+    `Rientro` DATE NOT NULL,
+    `NumeroOspitiTotale` INT UNSIGNED NOT NULL,
+    `CostoOperativo` DECIMAL(10,2) UNSIGNED NOT NULL,
     `Itinerario` VARCHAR(100) NOT NULL,
     PRIMARY KEY (`Partenza`, `Itinerario`),
     CONSTRAINT `fk_EdizioneViaggioPassata_Itinerario1`
@@ -62,10 +62,10 @@ CREATE INDEX `fk_EdizioneViaggioPassata_Itinerario1_idx` ON `AgenziaViaggio`.`Ed
 -- Table `AgenziaViaggio`.`EdizioneViaggioFutura`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`EdizioneViaggioFutura` (
-                                                                        `Partenza` DATE NOT NULL,
-                                                                        `Rientro` DATE NOT NULL,
-                                                                        `NumeroOspitiTotale` INT UNSIGNED NOT NULL,
-                                                                        `CostoOperativo` DECIMAL(10,2) UNSIGNED NOT NULL,
+    `Partenza` DATE NOT NULL,
+    `Rientro` DATE NOT NULL,
+    `NumeroOspitiTotale` INT UNSIGNED NOT NULL,
+    `CostoOperativo` DECIMAL(10,2) UNSIGNED NOT NULL,
     `Itinerario` VARCHAR(100) NOT NULL,
     PRIMARY KEY (`Partenza`, `Itinerario`),
     CONSTRAINT `fk_EdizioneViaggioPassata_Itinerario10`
@@ -82,9 +82,9 @@ CREATE INDEX `fk_EdizioneViaggioPassata_Itinerario1_idx` ON `AgenziaViaggio`.`Ed
 -- Table `AgenziaViaggio`.`Prenotazione`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`Prenotazione` (
-                                                               `IDprenotazione` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-                                                               `NumeroOspitiPrenotazione` INT UNSIGNED NOT NULL,
-                                                               `InfoCliente` VARCHAR(16) NOT NULL,
+    `IDprenotazione` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `NumeroOspitiPrenotazione` INT UNSIGNED NOT NULL,
+    `InfoCliente` VARCHAR(16) NOT NULL,
     `PartenzaP` DATE NULL,
     `ItinerarioP` VARCHAR(100) NULL,
     `PartenzaF` DATE NULL,
@@ -118,8 +118,8 @@ CREATE INDEX `fk_Prenotazione_EdizioneViaggioFutura1_idx` ON `AgenziaViaggio`.`P
 -- Table `AgenziaViaggio`.`AutobusAgenzia`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`AutobusAgenzia` (
-                                                                 `IDmezzo` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-                                                                 `CostoMezzo` DECIMAL(10,2) UNSIGNED NOT NULL,
+    `IDmezzo` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `CostoMezzo` DECIMAL(10,2) UNSIGNED NOT NULL,
     `Capienza` INT UNSIGNED NOT NULL,
     PRIMARY KEY (`IDmezzo`))
     ENGINE = InnoDB;
@@ -129,7 +129,7 @@ CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`AutobusAgenzia` (
 -- Table `AgenziaViaggio`.`Citta`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`Citta` (
-                                                        `NomeCitta` VARCHAR(100) NOT NULL,
+    `NomeCitta` VARCHAR(100) NOT NULL,
     PRIMARY KEY (`NomeCitta`))
     ENGINE = InnoDB;
 
@@ -138,9 +138,9 @@ CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`Citta` (
 -- Table `AgenziaViaggio`.`TappaNotturna`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`TappaNotturna` (
-                                                                `Numero` INT UNSIGNED NOT NULL,
-                                                                `DurataTappa` INT UNSIGNED NOT NULL,
-                                                                `Itinerario` VARCHAR(100) NOT NULL,
+    `Numero` INT UNSIGNED NOT NULL,
+    `DurataTappa` INT UNSIGNED NOT NULL,
+    `Itinerario` VARCHAR(100) NOT NULL,
     `Citta` VARCHAR(100) NOT NULL,
     PRIMARY KEY (`Numero`, `Itinerario`),
     CONSTRAINT `fk_TappaNotturna_Itinerario1`
@@ -164,7 +164,7 @@ CREATE INDEX `fk_TappaNotturna_Citta1_idx` ON `AgenziaViaggio`.`TappaNotturna` (
 -- Table `AgenziaViaggio`.`Albergo`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`Albergo` (
-                                                          `NomeAlbergo` VARCHAR(100) NOT NULL,
+    `NomeAlbergo` VARCHAR(100) NOT NULL,
     `Referente` VARCHAR(100) NOT NULL,
     `CostoNotteOspite` DECIMAL(10,2) NOT NULL,
     `NumeroMassimoOspiti` INT NOT NULL,
@@ -190,8 +190,8 @@ CREATE UNIQUE INDEX `Email_UNIQUE` ON `AgenziaViaggio`.`Albergo` (`Email` ASC) V
 -- Table `AgenziaViaggio`.`TramiteP`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`TramiteP` (
-                                                           `Partenza` DATE NOT NULL,
-                                                           `Itinerario` VARCHAR(100) NOT NULL,
+    `Partenza` DATE NOT NULL,
+    `Itinerario` VARCHAR(100) NOT NULL,
     `IDmezzo` INT UNSIGNED NOT NULL,
     PRIMARY KEY (`Partenza`, `Itinerario`, `IDmezzo`),
     CONSTRAINT `fk_TramiteP_EdizioneViaggioPassata1`
@@ -213,8 +213,8 @@ CREATE INDEX `fk_TramiteP_AutobusAgenzia1_idx` ON `AgenziaViaggio`.`TramiteP` (`
 -- Table `AgenziaViaggio`.`TramiteF`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`TramiteF` (
-                                                           `Partenza` DATE NOT NULL,
-                                                           `Itinerario` VARCHAR(100) NOT NULL,
+    `Partenza` DATE NOT NULL,
+    `Itinerario` VARCHAR(100) NOT NULL,
     `IDmezzo` INT UNSIGNED NOT NULL,
     PRIMARY KEY (`Partenza`, `Itinerario`, `IDmezzo`),
     CONSTRAINT `fk_TramiteF_EdizioneViaggioFutura1`
@@ -236,8 +236,8 @@ CREATE INDEX `fk_TramiteF_AutobusAgenzia1_idx` ON `AgenziaViaggio`.`TramiteF` (`
 -- Table `AgenziaViaggio`.`AlloggioP`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`AlloggioP` (
-                                                            `EdizioneViaggio` DATE NOT NULL,
-                                                            `ItinerarioViaggio` VARCHAR(100) NOT NULL,
+    `EdizioneViaggio` DATE NOT NULL,
+    `ItinerarioViaggio` VARCHAR(100) NOT NULL,
     `TappaNotturna` INT UNSIGNED NOT NULL,
     `ItinerarioTappa` VARCHAR(100) NOT NULL,
     `NomeAlbergo` VARCHAR(100) NOT NULL,
@@ -271,8 +271,8 @@ CREATE INDEX `report_alloggioP` ON `AgenziaViaggio`.`AlloggioP` (`EdizioneViaggi
 -- Table `AgenziaViaggio`.`AlloggioF`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`AlloggioF` (
-                                                            `EdizioneViaggio` DATE NOT NULL,
-                                                            `ItinerarioViaggio` VARCHAR(100) NOT NULL,
+    `EdizioneViaggio` DATE NOT NULL,
+    `ItinerarioViaggio` VARCHAR(100) NOT NULL,
     `TappaNotturna` INT UNSIGNED NOT NULL,
     `ItinerarioTappa` VARCHAR(100) NOT NULL,
     `NomeAlbergo` VARCHAR(100) NOT NULL,
@@ -324,25 +324,31 @@ BEGIN
     -- definizione variabile locale v_ruolo
     DECLARE v_ruolo ENUM('Cliente','Agente');
 
-    -- ricerca Utente con p_username, p_password e memorizza il suo Ruolo in v_ruolo
-SELECT Ruolo
-INTO v_ruolo
-FROM Utente
-WHERE Username = p_username
-  AND Password = p_password;
+    -- verifica che p_numeroOspiti sia valido
+    IF p_numeroOspiti <= 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Numero ospiti non valido';
+    END IF;
 
--- se non trova nulla (v_ruolo==NULL), viene sollevata una SQLException
-IF v_ruolo IS NULL THEN
+    -- ricerca Utente con p_username, p_password e memorizza il suo Ruolo in v_ruolo
+    SELECT Ruolo
+    INTO v_ruolo
+    FROM Utente
+    WHERE Username = p_username
+    AND Password = p_password;
+
+    -- se non trova nulla (v_ruolo==NULL), viene sollevata una SQLException
+    IF v_ruolo IS NULL THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Credenziali non valide';
-END IF;
+    END IF;
 
     -- mapping ENUM->INT, per la costruzione dell'output p_ruolo
     IF v_ruolo = 'Cliente' THEN
         SET p_ruolo = 1;
     ELSEIF v_ruolo = 'Agente' THEN
         SET p_ruolo = 2;
-END IF;
+    END IF;
 
 END$$
 
@@ -363,6 +369,20 @@ CREATE PROCEDURE registraPrenotazione(
     OUT p_idPrenotazione INT
 )
 BEGIN
+
+    IF p_numeroOspiti <= 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Numero ospiti non valido';
+    END IF;
+
+    -- implementazione regola aziendale:
+    -- verifica che la prenotazione sia inerente un viaggio con partenza prevista tra >=20 giorni
+    IF DATEDIFF(p_partenzaF, CURRENT_DATE()) < 20 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT =
+            'Prenotazione non consentita: meno di 20 giorni alla partenza';
+    END IF;
+
 
     -- inserisce in Prenotazione la tupla definita dai valori in input:
     -- una nuova prenotazione deve sempre riferirsi ad una EdizioneViaggioFutura dunque si forzano PartenzaP, ItinerarioP a NULL
@@ -394,6 +414,65 @@ DELIMITER ;
 
 
 -- -----------------------------------------------------
+-- stored procedure `AgenziaViaggio`.`cancellaPrenotazione`
+-- -----------------------------------------------------
+
+DELIMITER $$
+
+CREATE PROCEDURE cancellaPrenotazione(
+    IN p_idPrenotazione INT,
+    IN p_username VARCHAR(16)
+)
+BEGIN
+
+    -- definizione variabili locali
+    DECLARE v_partenza DATE;
+    DECLARE v_cliente VARCHAR(16);
+
+    -- se la successiva SELECT non trova righe forza v_cliente = NULL rendendo i successivi controlli affidabili
+    -- necessario in quanto il comportamento di MySQL in seguito ad evento NOT FOUND è imprevedibile
+    DECLARE CONTINUE HANDLER FOR NOT FOUND
+    SET v_cliente = NULL;
+
+    -- recupera i dati della prenotazione in base ad p_idPrenotazione
+    SELECT InfoCliente, PartenzaF
+    INTO v_cliente, v_partenza
+    FROM Prenotazione
+    WHERE IDprenotazione = p_idPrenotazione;
+
+    -- verifica se la prenotazione esiste
+    -- se la prenotazione non esiste, allora v_cliente==NULL
+    IF v_cliente IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Prenotazione inesistente';
+    END IF;
+
+    -- implementazione regola aziendale:
+    -- verifica che la prenotazione appartenga al cliente che ne richiede la cancellazione
+    IF v_cliente <> p_username THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'La prenotazione non appartiene al cliente';
+    END IF;
+
+    -- implementazione regola aziendale:
+    -- verifica che la prenotazione sia inerente un viaggio con partenza prevista tra >=20 giorni
+    IF DATEDIFF(v_partenza, CURRENT_DATE()) < 20 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT =
+            'Cancellazione non consentita: meno di 20 giorni alla partenza';
+    END IF;
+
+    -- cancellazione della prenotazione identificata da p_idPrenotazione
+    DELETE FROM Prenotazione
+    WHERE IDprenotazione = p_idPrenotazione;
+
+END$$
+
+DELIMITER ;
+
+
+
+-- -----------------------------------------------------
 -- USERS AND PRIVILEGES
 -- -----------------------------------------------------
 DROP USER IF EXISTS 'login';
@@ -403,6 +482,7 @@ GRANT EXECUTE ON procedure `AgenziaViaggio`.`login` TO 'login';
 DROP USER IF EXISTS 'cliente';
 CREATE USER 'cliente' IDENTIFIED BY 'cliente';
 GRANT EXECUTE ON procedure `AgenziaViaggio`.`registraPrenotazione` TO 'cliente';
+GRANT EXECUTE ON procedure `AgenziaViaggio`.`cancellaPrenotazione` TO 'cliente';
 
 DROP USER IF EXISTS 'agente';
 CREATE USER 'agente' IDENTIFIED BY 'agente';

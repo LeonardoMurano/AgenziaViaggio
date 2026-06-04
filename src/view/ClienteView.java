@@ -4,6 +4,7 @@
 package view;
 
 import model.domain.Utente;
+import model.dto.CancellaPrenotazioneRequest;
 import model.dto.RegistraPrenotazioneRequest;
 
 import java.time.LocalDate;
@@ -64,7 +65,7 @@ public class ClienteView {
 
 
 
-    //FUNZIONI VIEW RELATIVE OPERAZIONE: CL1 - RegistraItinerario
+    //FUNZIONI VIEW RELATIVE OPERAZIONE: CL1 - RegistraPrenotazione
 
     public RegistraPrenotazioneRequest richiediRegistraPrenotazione(Utente cred){
 
@@ -113,5 +114,37 @@ public class ClienteView {
     }
 
 
+    //FUNZIONI VIEW RELATIVE OPERAZIONE: CL2 - CancellaPrenotazione
 
+    public CancellaPrenotazioneRequest richiediCancellaPrenotazione(Utente cred){
+
+        //richiesta in input delle informazioni inerenti la prenotazione da registrare
+        Scanner input = new Scanner(System.in);
+        System.out.print("\n*** OPERAZIONE DI CANCELLAZIONE PRENOTAZIONE ***\n");
+        System.out.print("ID prenotazione: ");
+        String stringIdrenotazione = input.nextLine();
+
+        //estrazione dello username del Cliente da cred
+        String username = cred.getUsername();
+
+        try{
+            //conversione formato String->int
+            int idPrenotazione = Integer.parseInt(stringIdrenotazione);
+
+            //restituzione riferimento alla nuova istanza di record di CancellaItinerarioRequest
+            return new CancellaPrenotazioneRequest(idPrenotazione, username);
+
+        } catch (NumberFormatException e) {
+            //gestione errore dovuto a formato idPrenotazione non valido
+            System.out.println("\nFormato dell'ID della prenotazione non valido. Utilizzare un valore numerico intero.\n");
+            return null;
+        }
+    }
+
+    public void visualizzaEsitoCancellazione(){
+
+        //stampa a schermo l'esito positivo dell'operazione cancellaPrenotazione
+        System.out.println("*********************************");
+        System.out.println("Cancellazione prenotazione completata con successo.\n");
+    }
 }

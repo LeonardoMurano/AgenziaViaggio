@@ -10,7 +10,7 @@ public class RegistraPrenotazioneProceduraDAO {
 
     public int execute(RegistraPrenotazioneRequest input) throws DAOException {
 
-        //estrazione del contenuto di LoginRequest
+        //estrazione del contenuto di RegistraPrenotazioneRequest
         int numeroOspitiprenotazione = input.numeroOspitiPrenotazione();
         String username = input.username();
         LocalDate dataPartenza = input.dataPartenza();
@@ -19,7 +19,7 @@ public class RegistraPrenotazioneProceduraDAO {
         //dichiarazione attributo idPrenotazione
         int idPrenotazione;
 
-        //esecuzione stored procedure 'registraItinerario'
+        //esecuzione stored procedure 'registraPrenotazione'
         try {
             //preparazione connessione
             Connection conn = ConnectionFactory.getConnection();
@@ -38,7 +38,7 @@ public class RegistraPrenotazioneProceduraDAO {
 
         } catch (SQLException e) {
             //gestione eccezione dovuta a input errato
-            throw new DAOException("Errore nella registrazione Prenotazione: " + e.getMessage());
+            throw new DAOException("Errore nella registrazione prenotazione: " + e.getMessage());
         }
 
         //restituisce al chiamante idPrenotazione

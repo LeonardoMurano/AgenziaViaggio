@@ -6,9 +6,11 @@ package controller;
 import exception.ApplicationException;
 import exception.ControllerException;
 import exception.DAOException;
+import model.dao.CancellaPrenotazioneProceduraDAO;
 import model.dao.ConnectionFactory;
 import model.dao.RegistraPrenotazioneProceduraDAO;
 import model.domain.Utente;
+import model.dto.CancellaPrenotazioneRequest;
 import model.dto.RegistraPrenotazioneRequest;
 import model.dto.RegistraPrenotazioneRequest;
 import view.ClienteView;
@@ -84,14 +86,32 @@ public class ClienteController implements Controller {
             int idPrenotazione = new RegistraPrenotazioneProceduraDAO().execute(request);
             //invoca funzione di stampa a schermo dell'idPrenotazione
             view.visualizzaIdPrenotazione(idPrenotazione);
+
         } catch (DAOException e) {
-            //gestione errori nella registrazione prenotazione
+            //gestione errori nella procedura di registrazione prenotazione
             throw new ControllerException(e.getMessage(), e);
         }
-
     }
 
 
 
-    void  cancellaPrenotazione() throws ControllerException {}
+    void  cancellaPrenotazione() throws ControllerException {
+
+        //invoca ClienteView per richiede i dati in input al Cliente
+        CancellaPrenotazioneRequest request = view.richiediCancellaPrenotazione(cred);
+
+        //verifica che la richiesta sia andata a buon fine
+        if (request == null) {return;}
+
+        try{
+            //esecuzione procedura di cancellazione prenotazione
+            new CancellaPrenotazioneProceduraDAO().execute(request);
+            //invoca funzione di stampa a schermo dell'esito positivo
+            view.visualizzaEsitoCancellazione();
+
+        } catch (DAOException e) {
+            //gestione errori nella procedura di cancellazione prenotazione
+            throw new ControllerException(e.getMessage(), e);
+        }
+    }
 }
