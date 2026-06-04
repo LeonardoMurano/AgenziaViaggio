@@ -46,7 +46,7 @@ public class AgenteView {
                 choice = Integer.parseInt(input.nextLine());
 
                 //verifica se l'input ricevuto è valido
-                if (choice >= 1 && choice <= 4) {
+                if (choice >= 1 && choice <= 8) {
                     //se valido, esce dal ciclo while(True)
                     break;
                 }
@@ -105,9 +105,9 @@ public class AgenteView {
 
             //richiesta in input delle informazioni inerenti ogni tappa
             for (int i = 0; i < counterTappe; i++) {
-                System.out.print("Durata tappa: ");
+                System.out.print("Durata tappa " + (i+1) + "-esima: ");
                 String stringDurataTappa = input.nextLine();
-                System.out.print("Città tappa: ");
+                System.out.print("Città tappa " + (i+1) + "-esima: ");
                 citta.add(input.nextLine());
                 durataTappa.add(Integer.parseInt(stringDurataTappa));
                 numeroTappa.add(i);

@@ -21,26 +21,29 @@ public class RegistraItinerarioProceduraDAO {
         List<Integer> durataTappa = input.durataTappa();
         List<String> citta = input.citta();
 
+        //serializzazione attributi inerenti tappe notturne
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < numeroTappa.size(); i++){
+            sb.append(numeroTappa.get(i))
+                    .append(":")
+                    .append(durataTappa.get(i))
+                    .append(":")
+                    .append(citta.get(i));
+            if (i < numeroTappa.size() - 1) {
+                sb.append(";");
+            }
+        }
+        //memorizzazione attributi inerenti le tappe notturne serializzati
+        String tappe = sb.toString();
+
         try{
             //preparazione connessione
             Connection conn = ConnectionFactory.getConnection();
-
-            //preparazione statement per il popolamento della tabella di sostegno 'TappeTemp'
-            PreparedStatement ps = conn.prepareStatement("INSERT INTO TappeTemp (numeroTappa, durata, itinerario, citta) VALUES (?,?,?,?)");
-
-            //popolamento della tabella di sostegno 'TappeTemp'
-            for(int i = 0; i < numeroTappa.size(); i++){
-                ps.setInt(1, numeroTappa.get(i));
-                ps.setInt(2, durataTappa.get(i));
-                ps.setString(3, nomeItinerario);
-                ps.setString(4, citta.get(i));
-                ps.executeUpdate();
-            }
-
             //preparazione ed esecuzione stored procedure 'registraItinerario'
-            CallableStatement cs = conn.prepareCall("{call registraItinerario(?,?)}");
+            CallableStatement cs = conn.prepareCall("{call registraItinerario(?,?,?)}");
             cs.setString(1, nomeItinerario);
             cs.setBigDecimal(2, costo);
+            cs.setString(3, tappe);
             cs.executeQuery();
 
             //non viene restituito alcun output

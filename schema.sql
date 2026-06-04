@@ -307,22 +307,6 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
 
 -- -----------------------------------------------------
--- TEMPORARY TABLES
--- -----------------------------------------------------
-
--- -----------------------------------------------------
--- Temporary table `AgenziaViaggio`.`tappeTemp`
--- -----------------------------------------------------
-
--- tabella di sostegno utilizzata in stored procedure `AgenziaViaggio`.`registraPrenotazione`
-CREATE TEMPORARY TABLE IF NOT EXISTS `AgenziaViaggio`.`tappeTemp` (
-    `numeroTappa` INT,
-    `durata` INT,
-    `citta` VARCHAR(100)
-);
-
-
--- -----------------------------------------------------
 -- STORED PROCEDURES
 -- -----------------------------------------------------
 
@@ -491,37 +475,76 @@ DELIMITER $$
 
 CREATE PROCEDURE registraItinerario(
     IN p_nomeItinerario VARCHAR(100),
-    IN p_costo DECIMAL(10,2)
+    IN p_costo DECIMAL(10,2),
+    IN p_tappe TEXT
 )
 BEGIN
 
-    -- verifica che la tabella temporanea `AgenziaViaggio`.`tappeTemp` sia stata popolata
-    IF NOT EXISTS (SELECT 1 FROM TappeTemp) THEN
+    -- definizione variabili locali
+    DECLARE v_numero INT;
+    DECLARE v_durata INT;
+    DECLARE v_citta VARCHAR(100);
+    DECLARE v_pos INT;
+    DECLARE v_token TEXT;
+
+    -- implementazione regola aziendale:
+    -- verifica che l'Itinerario sia composto da almeno una tappa valida
+    -- non è valida se (p_tappe == NULL) or (p_tappe eliminando gli spazi == NULL) or (#':' == 0)
+    IF p_tappe IS NULL OR LENGTH(TRIM(p_tappe)) = 0 OR LOCATE(':', p_tappe) = 0 THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Nessuna tappa inserita';
+        SET MESSAGE_TEXT = 'Serve almeno una tappa valida';
     END IF;
 
-    -- inserimento informazioni inerenti Itinerario
+
+    -- registrazione Itinerario
     INSERT INTO Itinerario (Nome, CostoItinerario)
     VALUES (p_nomeItinerario, p_costo);
 
-    -- inserimento informazioni inerenti le tappe notturna da cui è composto Itinerario
-    -- l'inserimento avviene utilizzando la tabella temporanea `AgenziaViaggio`.`tappeTemp` come struttura di sostegno
-    INSERT INTO TappaNotturna (
-        Numero,
-        DurataTappa,
-        Itinerario,
-        Citta
-    )
-    SELECT
-        numeroTappa,
-        durata,
-        p_nomeItinerario,
-        citta
-    FROM tappeTemp;
+    -- parsing delle tappe (separate da ';')
 
-    -- pulizia tabella momentanea `AgenziaViaggio`.`tappeTemp`
-    DELETE FROM TappeTemp;
+    -- continua fino a quando ci sono tappe da leggere
+    WHILE LENGTH(p_tappe) > 0 DO
+        -- cerca il prossimo blocco (i blocchi sono separati da ';')
+        SET v_pos = LOCATE(';', p_tappe);
+        -- se non viene trovato nessun ';' allora è l'ultimo blocco:
+        IF v_pos = 0 THEN
+           -- estrae tutto il contenuto di p_tappe e svuota la stringa
+            SET v_token = p_tappe;
+            SET p_tappe = '';
+        -- se viene trovato un ';' allora è un blocco intermedio:
+        ELSE
+            -- estrae solo la sottostringa di p_tappe che precede ';'
+            SET v_token = SUBSTRING(p_tappe, 1, v_pos - 1);
+            -- aggiorna la stringa p_tappe eliminando la parte appena letta
+            SET p_tappe = SUBSTRING(p_tappe, v_pos + 1);
+        END IF;
+
+        -- parsing interno numero:durata:citta
+
+        -- prende il primo segmento separato da ':'
+        SET v_numero = SUBSTRING_INDEX(v_token, ':', 1);
+        -- prende i primi 2 segmenti separati da ':'
+        -- dal risultato intermedio, prende l'ultimo segmento separato da ':'
+        SET v_durata = SUBSTRING_INDEX(SUBSTRING_INDEX(v_token, ':', 2), ':', -1);
+        -- prende l'ultimo segmento separato da ':'
+        SET v_citta  = SUBSTRING_INDEX(v_token, ':', -1);
+
+        -- inserimento tappa i-esimaa estratta da input serializzato
+        INSERT INTO TappaNotturna (
+            numero,
+            durataTappa,
+            itinerario,
+            citta
+
+        )
+        VALUES (
+           v_numero,
+           v_durata,
+           p_nomeItinerario,
+           v_citta
+
+        );
+    END WHILE;
 
 END$$
 
