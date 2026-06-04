@@ -12,7 +12,6 @@ import model.dao.RegistraPrenotazioneProceduraDAO;
 import model.domain.Utente;
 import model.dto.CancellaPrenotazioneRequest;
 import model.dto.RegistraPrenotazioneRequest;
-import model.dto.RegistraPrenotazioneRequest;
 import view.ClienteView;
 import model.enums.Ruolo;
 

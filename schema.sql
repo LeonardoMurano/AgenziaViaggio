@@ -305,6 +305,23 @@ SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
 
+
+-- -----------------------------------------------------
+-- TEMPORARY TABLES
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Temporary table `AgenziaViaggio`.`tappeTemp`
+-- -----------------------------------------------------
+
+-- tabella di sostegno utilizzata in stored procedure `AgenziaViaggio`.`registraPrenotazione`
+CREATE TEMPORARY TABLE IF NOT EXISTS `AgenziaViaggio`.`tappeTemp` (
+    `numeroTappa` INT,
+    `durata` INT,
+    `citta` VARCHAR(100)
+);
+
+
 -- -----------------------------------------------------
 -- STORED PROCEDURES
 -- -----------------------------------------------------
@@ -466,6 +483,50 @@ END$$
 DELIMITER ;
 
 
+-- -----------------------------------------------------
+-- stored procedure `AgenziaViaggio`.`registraItinerario`
+-- -----------------------------------------------------
+
+DELIMITER $$
+
+CREATE PROCEDURE registraItinerario(
+    IN p_nomeItinerario VARCHAR(100),
+    IN p_costo DECIMAL(10,2)
+)
+BEGIN
+
+    -- verifica che la tabella temporanea `AgenziaViaggio`.`tappeTemp` sia stata popolata
+    IF NOT EXISTS (SELECT 1 FROM TappeTemp) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Nessuna tappa inserita';
+    END IF;
+
+    -- inserimento informazioni inerenti Itinerario
+    INSERT INTO Itinerario (Nome, CostoItinerario)
+    VALUES (p_nomeItinerario, p_costo);
+
+    -- inserimento informazioni inerenti le tappe notturna da cui è composto Itinerario
+    -- l'inserimento avviene utilizzando la tabella temporanea `AgenziaViaggio`.`tappeTemp` come struttura di sostegno
+    INSERT INTO TappaNotturna (
+        Numero,
+        DurataTappa,
+        Itinerario,
+        Citta
+    )
+    SELECT
+        numeroTappa,
+        durata,
+        p_nomeItinerario,
+        citta
+    FROM tappeTemp;
+
+    -- pulizia tabella momentanea `AgenziaViaggio`.`tappeTemp`
+    DELETE FROM TappeTemp;
+
+END$$
+
+DELIMITER ;
+
 
 -- -----------------------------------------------------
 -- USERS AND PRIVILEGES
@@ -481,6 +542,7 @@ GRANT EXECUTE ON procedure `AgenziaViaggio`.`cancellaPrenotazione` TO 'cliente';
 
 DROP USER IF EXISTS 'agente';
 CREATE USER 'agente' IDENTIFIED BY 'agente';
+GRANT EXECUTE ON procedure `AgenziaViaggio`.`registraItinerario` TO 'agente';
 
 
 -- -----------------------------------------------------

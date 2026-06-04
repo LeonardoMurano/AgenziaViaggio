@@ -5,7 +5,10 @@ package controller;
 
 import exception.ApplicationException;
 import exception.ControllerException;
+import exception.DAOException;
 import model.dao.ConnectionFactory;
+import model.dao.RegistraItinerarioProceduraDAO;
+import model.dto.RegistraItinerarioRequest;
 import view.AgenteView;
 import model.enums.Ruolo;
 
@@ -56,8 +59,31 @@ public class AgenteController implements Controller {
     }
 
 
-    //definire una funzione per ogni operazione di Agente inserita nello switch
-    void  RegistraItinerario() throws ControllerException {}
+//DEFINIZIONE DI UNA FUNZIONE PER IL CONTROLLO DELL'ESECUZIONE DI OGNI OPERAZIONE SU CUI AGENTE HA GRANT
+
+
+
+
+    void  RegistraItinerario() throws ControllerException {
+
+        //invoca AgenteView per richiede i dati in input all'agente
+        RegistraItinerarioRequest request = view.registraItinerarioRichiedi();
+
+        //verifica che la richiesta sia andata a buon fine
+        if (request == null) {return;}
+        try {
+            //esecuzione procedura di registrazione itinerario
+            new RegistraItinerarioProceduraDAO().execute(request);
+            //invoca funzione di stampa a schermo dell'esito positivo
+            view.visualizzaEsitoRegistrazioneItinerario();
+
+        } catch (DAOException e) {
+            //gestione errori nella procedura di registrazione itinerario
+            throw new ControllerException(e.getMessage(), e);
+        }
+    }
+
+
     void  RegistraEdizioneViaggio() throws ControllerException {}
     void  RegistraAlbergo() throws ControllerException {}
     void  RegistraAutobusAgenzia() throws ControllerException {}

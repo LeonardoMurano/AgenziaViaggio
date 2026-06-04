@@ -3,6 +3,13 @@
  */
 package view;
 
+import model.domain.Itinerario;
+import model.domain.TappaNotturna;
+import model.dto.RegistraItinerarioRequest;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class AgenteView {
@@ -64,5 +71,70 @@ public class AgenteView {
 
 
 
-    //definire una funzione per ogni operazione su cui Agente ha grant
+    //FUNZIONI VIEW RELATIVE OPERAZIONE: AG1 - RegistraItinerario
+
+    public RegistraItinerarioRequest  registraItinerarioRichiedi() {
+
+        //richiesta in input delle informazioni inerenti l'itinerario da registrare
+        Scanner input = new Scanner(System.in);
+        System.out.print("\n*** OPERAZIONE DI REGISTRAZIONE ITINERARIO ***\n");
+        System.out.print("Nome itinerario: ");
+        String nomeItinerario = input.nextLine();
+        System.out.print("Costo itinerario: ");
+        String StringCosto = input.nextLine();
+        System.out.print("Numero tappe: ");
+        String stringCounterTappe = input.nextLine();
+
+        try{
+            //conversione formato String->BigDecimal
+            BigDecimal costo = new BigDecimal(StringCosto);
+            //conversione formato String->int
+            int counterTappe = Integer.parseInt(stringCounterTappe);
+
+            //verifica validità argomento numeroTappe
+            if (counterTappe < 1) {
+                //gestione errore dovuto ad argomento numeroTappe non valido
+                System.out.println("\nArgomento del numero di tappe non valido. Inserire un valore >=1.\n");
+                return null;
+            }
+
+            //inizializzazione liste in cui memorizzare informazioni inerenti le tappe
+            List<Integer> durataTappa = new ArrayList<>();
+            List<Integer> numeroTappa = new ArrayList<>();
+            List<String> citta = new ArrayList<>();
+
+            //richiesta in input delle informazioni inerenti ogni tappa
+            for (int i = 0; i < counterTappe; i++) {
+                System.out.print("Durata tappa: ");
+                String stringDurataTappa = input.nextLine();
+                System.out.print("Città tappa: ");
+                citta.add(input.nextLine());
+                durataTappa.add(Integer.parseInt(stringDurataTappa));
+                numeroTappa.add(i);
+            }
+
+            //verifica coerenza liste parallele
+            int size = numeroTappa.size();
+            if (durataTappa.size() != size || citta.size() != size) {
+                //gestione errore dovuto a liste incoerenti
+                throw new IllegalStateException("Liste tappe incoerenti");
+            }
+
+            //restituzione riferimento alla nuova istanza di record di RegistraItinerarioRequest
+            return new RegistraItinerarioRequest(nomeItinerario, costo, numeroTappa, durataTappa, citta);
+
+        } catch (NumberFormatException e) {
+            //gestione errore dovuto a formato numeroTappe, costo o durataTappa[i] non valido
+            System.out.println("\nFormato non valido. Utilizzare un valore numerico intero.\n");
+            return null;
+        }
+    }
+
+    public void visualizzaEsitoRegistrazioneItinerario(){
+
+        //stampa a schermo l'esito positivo dell'operazione registraItinerario
+        System.out.println("*********************************");
+        System.out.println("Registrazione itinerario completata con successo.\n");
+    }
+
 }

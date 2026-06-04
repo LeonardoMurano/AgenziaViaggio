@@ -88,7 +88,7 @@ public class ClienteView {
             //conversione formato String->int
             int numeroOspitiPrenotazione = Integer.parseInt(stringNumeroOspitiPrenotazione);
 
-            //restituzione riferimento alla nuova istanza di record di RegistraItinerarioRequest
+            //restituzione riferimento alla nuova istanza di record di RegistraPrenotazioneRequest
             return new RegistraPrenotazioneRequest(numeroOspitiPrenotazione,username, dataPartenza, itinerario);
 
         } catch (DateTimeParseException e) {
