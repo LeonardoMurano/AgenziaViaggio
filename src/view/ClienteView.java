@@ -22,7 +22,7 @@ public class ClienteView {
         System.out.println("*** Operazioni disponibili: ***\n");
         System.out.println("1) Registra prenotazione");
         System.out.println("2) Cancella prenotazione");
-        System.out.println("4) Esci dal sistema");
+        System.out.println("3) Esci dal sistema");
 
         //dichiarazione lettore da tastiera (legge input da console)
         Scanner input = new Scanner(System.in);
@@ -39,7 +39,7 @@ public class ClienteView {
                 choice = Integer.parseInt(input.nextLine());
 
                 //verifica se l'input ricevuto è valido
-                if (choice >= 1 && choice <= 4) {
+                if (choice >= 1 && choice <= 3) {
                     //se valido, esce dal ciclo while(True)
                     break;
                 }
@@ -70,7 +70,7 @@ public class ClienteView {
 
         //richiesta in input delle informazioni inerenti la prenotazione da registrare
         Scanner input = new Scanner(System.in);
-        System.out.print("OPERAZIONE DI REGISTRAZIONE PRENOTAZIONE");
+        System.out.print("\n*** OPERAZIONE DI REGISTRAZIONE PRENOTAZIONE ***\n");
         System.out.print("Itinerario: ");
         String itinerario = input.nextLine();
         System.out.print("Data di partenza (yyyy-MM-dd): ");
@@ -92,11 +92,11 @@ public class ClienteView {
 
         } catch (DateTimeParseException e) {
             //gestione errore dovuto a formato della data di partenza non valido
-            System.out.println("Formato della data non valido. Utilizzare yyyy-MM-dd.\n");
+            System.out.println("\nFormato della data non valido. Utilizzare yyyy-MM-dd.\n");
             return null;
         } catch (NumberFormatException e) {
             //gestione errore dovuto a formato del numero di ospiti non valido
-            System.out.println("Formato del numero di ospiti non valido. Utilizzare un valore numerico intero.\n");
+            System.out.println("\nFormato del numero di ospiti non valido. Utilizzare un valore numerico intero.\n");
             return null;
         }
     }
@@ -104,12 +104,12 @@ public class ClienteView {
     public void visualizzaIdPrenotazione(int idPrenotazione){
 
         //stampa a schermo idPrenotazione generato come risultato dell'operazione registraPrenotazione
-        System.out.println("Registrazione prenotazione completata.\n");
+        System.out.println("*********************************");
+        System.out.println("Registrazione prenotazione completata.");
         System.out.println("ID prenotazione: " + idPrenotazione);
-        System.out.println("*********************************\n");
-        System.out.println("è possibile disdire la prenotazione:\n");
-        System.out.println("- 20 giorni prima della partenza;\n");
-        System.out.println("- utilizzando l'ID della prenotazione.");
+        System.out.println("è possibile disdire la prenotazione:");
+        System.out.println("- 20 giorni prima della partenza;");
+        System.out.println("- utilizzando l'ID della prenotazione.\n");
     }
 
 

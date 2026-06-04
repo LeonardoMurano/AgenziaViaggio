@@ -402,6 +402,7 @@ GRANT EXECUTE ON procedure `AgenziaViaggio`.`login` TO 'login';
 
 DROP USER IF EXISTS 'cliente';
 CREATE USER 'cliente' IDENTIFIED BY 'cliente';
+GRANT EXECUTE ON procedure `AgenziaViaggio`.`registraPrenotazione` TO 'cliente';
 
 DROP USER IF EXISTS 'agente';
 CREATE USER 'agente' IDENTIFIED BY 'agente';
