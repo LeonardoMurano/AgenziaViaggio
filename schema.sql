@@ -324,12 +324,6 @@ BEGIN
     -- definizione variabile locale v_ruolo
     DECLARE v_ruolo ENUM('Cliente','Agente');
 
-    -- verifica che p_numeroOspiti sia valido
-    IF p_numeroOspiti <= 0 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Numero ospiti non valido';
-    END IF;
-
     -- ricerca Utente con p_username, p_password e memorizza il suo Ruolo in v_ruolo
     SELECT Ruolo
     INTO v_ruolo
@@ -370,6 +364,7 @@ CREATE PROCEDURE registraPrenotazione(
 )
 BEGIN
 
+    -- verifica che il numero di ospiti sia >=0
     IF p_numeroOspiti <= 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Numero ospiti non valido';
