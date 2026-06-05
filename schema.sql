@@ -583,12 +583,6 @@ BEGIN
     FROM TappaNotturna
     WHERE Itinerario = p_nomeItinerario;
 
-    -- verifica se l'Itinerario è valido
-        IF v_durataTotale = 0 THEN
-            SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'Itinerario senza tappe non valido';
-        END IF;
-
     -- imposta v_dataRientro = p_dataPartenza + v_durataTotale
     SET v_dataRientro =
         DATE_ADD(p_dataPartenza, INTERVAL v_durataTotale DAY);
