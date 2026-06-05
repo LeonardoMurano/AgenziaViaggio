@@ -42,7 +42,7 @@ public class RegistraAlbergoProceduraDAO {
             //non viene restituito alcun output
             //l'operazione va a buon fine se non sono restituiti errori
 
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             //gestione eccezione dovuta a input errato
             throw new DAOException("Errore nella registrazione albergo: " + e.getMessage());
         }

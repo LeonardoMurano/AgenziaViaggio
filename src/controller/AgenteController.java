@@ -7,10 +7,7 @@ import exception.ApplicationException;
 import exception.ControllerException;
 import exception.DAOException;
 import model.dao.*;
-import model.dto.RegistraAlbergoRequest;
-import model.dto.RegistraAutobusAgenziaRequest;
-import model.dto.RegistraEdizioneViaggioRequest;
-import model.dto.RegistraItinerarioRequest;
+import model.dto.*;
 import view.AgenteView;
 import model.enums.Ruolo;
 
@@ -149,7 +146,25 @@ public class AgenteController implements Controller {
     }
 
 
-    void  AssociaAutobusAgenzia() throws ControllerException {}
+    void  AssociaAutobusAgenzia() throws ControllerException {
+
+        //invoca AgenteView per richiede i dati in input all'agente
+        AssociaAutobusAgenziaRequest request = view.associaAutobusAgenziaRichiedi();
+
+        //verifica che la richiesta sia andata a buon fine
+        if (request == null) {return;}
+        try{
+            //esecuzione procedura di associazione AutobusAgenzia
+            AssociaAutobusAgenziaOutput output = new AssociaAutobusAgenziaProceduraDAO().execute(request);
+
+            //invoca funzione di stampa a schermo dell'esito positivo
+            view.visualizzaEsitoAssociazioneAlbergo(output);
+
+        } catch (DAOException e) {
+            //gestione errori nella procedura di registrazione AutobusAgenzia
+            throw new ControllerException(e.getMessage(), e);
+        }
+    }
     void  AssociaAlbergo() throws ControllerException {}
     void  ReportEdizioneViaggio() throws ControllerException {}
 }

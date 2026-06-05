@@ -3,10 +3,7 @@
  */
 package view;
 
-import model.dto.RegistraAutobusAgenziaRequest;
-import model.dto.RegistraEdizioneViaggioRequest;
-import model.dto.RegistraItinerarioRequest;
-import model.dto.RegistraAlbergoRequest;
+import model.dto.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -276,4 +273,62 @@ public class AgenteView {
 
 
     //FUNZIONI VIEW RELATIVE OPERAZIONE: AG5 - AssociaAutobusAgenzia
+
+    public AssociaAutobusAgenziaRequest associaAutobusAgenziaRichiedi() {
+
+        //richiesta in input delle informazioni inerenti l'autobus da associare
+        Scanner input = new Scanner(System.in);
+        System.out.print("\n*** OPERAZIONE DI ASSOCIAZIONE AUTOBUS AGENZIA - EDIZIONE VIAGGIO ***\n");
+        System.out.print("ID mezzo da associare: ");
+        String stringIdMezzo = input.nextLine();
+        System.out.print("Itinerario dell'edizione: ");
+        String itinerario = input.nextLine();
+        System.out.print("Data di partenza: ");
+        String stringDataPartenza = input.nextLine();
+
+        try{
+            //conversione formato String->int
+            int idMezzo = Integer.parseInt(stringIdMezzo);
+            //conversione formato String->LocalDate
+            LocalDate dataPartenza = LocalDate.parse(stringDataPartenza);
+
+            //restituzione riferimento alla nuova istanza di record di AssociaAutobusAgenziaRequest
+            return new AssociaAutobusAgenziaRequest(idMezzo, itinerario, dataPartenza);
+
+        } catch (NumberFormatException e) {
+            //gestione errore dovuto a formati numerici non validi
+            System.out.println("\nFormato numerico non valido. Utilizzare un valore valido.\n");
+            return null;
+        } catch (DateTimeParseException e) {
+            //gestione errore dovuto a formato delle date non valido
+            System.out.println("\nFormato della data non valido. Utilizzare yyyy-MM-dd.\n");
+            return null;
+        }
+    }
+
+
+    public void visualizzaEsitoAssociazioneAlbergo(AssociaAutobusAgenziaOutput output) {
+
+        //estrazione del contenuto di AssociaAutobusAgenziaOutput
+        int capienzaTotale = output.capienzaTotale();
+        int capienzaRichiesta = output.numeroOspitiTotale();
+
+        //stampa a schermo l'esito positivo dell'operazione registraAutobusAgenzia
+        System.out.println("*********************************");
+        System.out.println("Associazione autobus dell'agenzia completata con successo.");
+
+        //calcolo numero ospiti mancanti
+        int capienzaResidua = capienzaRichiesta - capienzaTotale;
+
+        if (capienzaResidua > 0) {
+            System.out.println("ATTENZIONE: è necessario associare ulteriori autobus dell'agenzia.");
+            System.out.println("Capienza totale autobus associati: " + capienzaTotale);
+            System.out.println("Capienza totale richiesta autobus associati: " + capienzaRichiesta);
+            System.out.println("Capienza richiesta residua: " + capienzaResidua + "\n");
+        } else {
+            System.out.println("Non è necessario associare ulteriori autobus dell'agenzia.");
+            System.out.println("Capienza totale autobus associati: " + capienzaTotale);
+            System.out.println("Capienza totale richiesta autobus associati: " + capienzaRichiesta + "\n");
+        }
+    }
 }

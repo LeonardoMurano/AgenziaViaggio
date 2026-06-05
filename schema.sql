@@ -690,6 +690,100 @@ DELIMITER ;
 
 
 -- -----------------------------------------------------
+-- stored procedure `AgenziaViaggio`.`associaAutobusAgenzia`
+-- -----------------------------------------------------
+
+DELIMITER $$
+
+CREATE PROCEDURE associaAutobusAgenzia(
+    IN p_idmezzo INT,
+    IN p_itinerario VARCHAR(100),
+    IN p_partenza DATE,
+    OUT p_capienzaTotale INT,
+    OUT p_numeroOspitiTotale INT
+)
+BEGIN
+
+    -- dichiarazione variabili locali
+    DECLARE v_rientro DATE;
+
+    -- implementazione regola aziendale:
+    -- verifica che che l'associazione sia inerente un'EdizioneViaggioFutura con partenza prevista tra 0 e 20 giorni
+    IF DATEDIFF(p_partenza, CURDATE()) < 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Data di partenza già trascorsa';
+    END IF;
+
+    IF DATEDIFF(p_partenza, CURDATE()) > 20 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Associazione non consentita: più di 20 giorni alla partenza';
+    END IF;
+
+    -- implementazione regola aziendale:
+    --verifica se esiste l'EdizioneViaggioFutura ricercata
+    IF NOT EXISTS (
+        SELECT 1
+        FROM EdizioneViaggioFutura
+        WHERE Partenza = p_partenza
+          AND Itinerario = p_itinerario
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'EdizioneViaggioFutura non trovata';
+    END IF;
+    -- recupera la data di Rientro da EdizioneViaggioFutura
+    SELECT Rientro
+    INTO v_rientro
+    FROM EdizioneViaggioFutura
+    WHERE Partenza = p_partenza
+      AND Itinerario = p_itinerario;
+    -- verifica se AutobusAgenzia è associato ad almeno un'altra EdizioneViaggioFutura sovrapposta a quella attuale
+    IF EXISTS (
+        SELECT 1
+        FROM TramiteF TF
+        JOIN EdizioneViaggioF EV
+          ON TF.Partenza = EV.Partenza
+         AND TF.Itinerario = EV.Itinerario
+        WHERE TF.IDmezzo = p_idmezzo
+          AND NOT (
+              EV.Rientro < p_partenza
+              OR EV.Partenza > v_rientro
+          )
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Autobus già assegnato a un viaggio sovrapposto';
+    END IF;
+
+    -- inserimento nuova occorrenza di TramiteF
+    INSERT INTO TramiteF (Partenza, Itinerario, IDmezzo)
+    VALUES (p_partenza, p_itinerario, p_idmezzo);
+
+    -- calcolo della capienza totale (sommatoria delle capienze di ogni Autobus associato all'EdizioneViaggioFutura)
+    -- COALESCE(., 0) sostituisce al risultato NULL il valore 0
+    SELECT COALESCE(SUM(A.Capienza), 0)
+    INTO p_capienzaTotale
+    FROM TramiteF TF
+    JOIN AutobusAgenzia A ON A.IDmezzo = TF.IDmezzo
+    WHERE TF.Partenza = p_partenza
+      AND TF.Itinerario = p_itinerario;
+
+    -- recupero da EdizioneViaggioFutura del NumeroOspitiTotale
+    SELECT NumeroOspitiTotale
+    INTO p_numeroOspitiTotale
+    FROM EdizioneViaggioFutura
+    WHERE Partenza = p_partenza
+      AND Itinerario = p_itinerario;
+
+
+    -- implementazione regola aziendale:
+    -- l'output restituito serve ad implementare la stampa di un warning nel caso in cui:
+    -- p_numeroOspitiTotale > p_capienzaTotale
+
+END $$
+
+DELIMITER ;
+
+
+-- -----------------------------------------------------
 -- USERS AND PRIVILEGES
 -- -----------------------------------------------------
 
@@ -708,6 +802,7 @@ GRANT EXECUTE ON procedure `AgenziaViaggio`.`registraItinerario` TO 'agente';
 GRANT EXECUTE ON procedure `AgenziaViaggio`.`registraEdizioneViaggio` TO 'agente';
 GRANT EXECUTE ON procedure `AgenziaViaggio`.`registraAlbergo` TO 'agente';
 GRANT EXECUTE ON procedure `AgenziaViaggio`.`registraAutobusAgenzia` TO 'agente';
+GRANT EXECUTE ON procedure `AgenziaViaggio`.`associaAutobusAgenzia` TO 'agente';
 
 
 -- -----------------------------------------------------
