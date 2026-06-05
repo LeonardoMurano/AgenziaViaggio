@@ -271,7 +271,7 @@ public class AgenteView {
         //stampa a schermo l'esito positivo dell'operazione registraAutobusAgenzia
         System.out.println("*********************************");
         System.out.println("Registrazione autobus dell'agenzia completata con successo.");
-        System.out.println("ID prenotazione: " + idMezzo + "\n");
+        System.out.println("ID mezzo: " + idMezzo + "\n");
     }
 
 
