@@ -6,9 +6,9 @@ package controller;
 import exception.ApplicationException;
 import exception.ControllerException;
 import exception.DAOException;
-import model.dao.ConnectionFactory;
-import model.dao.RegistraEdizioneViaggioProceduraDAO;
-import model.dao.RegistraItinerarioProceduraDAO;
+import model.dao.*;
+import model.dto.RegistraAlbergoRequest;
+import model.dto.RegistraAutobusAgenziaRequest;
 import model.dto.RegistraEdizioneViaggioRequest;
 import model.dto.RegistraItinerarioRequest;
 import view.AgenteView;
@@ -107,8 +107,48 @@ public class AgenteController implements Controller {
     }
 
 
-    void  RegistraAlbergo() throws ControllerException {}
-    void  RegistraAutobusAgenzia() throws ControllerException {}
+    void  RegistraAlbergo() throws ControllerException {
+
+        //invoca AgenteView per richiede i dati in input all'agente
+        RegistraAlbergoRequest request = view.registraAlbergoRichiedi();
+
+        //verifica che la richiesta sia andata a buon fine
+        if (request == null) {return;}
+        try{
+            //esecuzione procedura di registrazione Albergo
+            new RegistraAlbergoProceduraDAO().execute(request);
+
+            //invoca funzione di stampa a schermo dell'esito positivo
+            view.visualizzaEsitoRegistrazioneAlbergo();
+
+        } catch (DAOException e) {
+            //gestione errori nella procedura di registrazione albergo
+            throw new ControllerException(e.getMessage(), e);
+        }
+    }
+
+
+    void  RegistraAutobusAgenzia() throws ControllerException {
+
+        //invoca AgenteView per richiede i dati in input all'agente
+        RegistraAutobusAgenziaRequest request = view.registraAutobusAgenziaRichiedi();
+
+        //verifica che la richiesta sia andata a buon fine
+        if (request == null) {return;}
+        try{
+            //esecuzione procedura di registrazione AutobusAgenzia
+            int idMezzo = new RegistraAutobusAgenziaProceduraDAO().execute(request);
+
+            //invoca funzione di stampa a schermo dell'esito positivo
+            view.visualizzaIdMezzo(idMezzo);
+
+        } catch (DAOException e) {
+            //gestione errori nella procedura di registrazione AutobusAgenzia
+            throw new ControllerException(e.getMessage(), e);
+        }
+    }
+
+
     void  AssociaAutobusAgenzia() throws ControllerException {}
     void  AssociaAlbergo() throws ControllerException {}
     void  ReportEdizioneViaggio() throws ControllerException {}

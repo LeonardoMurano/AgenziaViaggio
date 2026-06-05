@@ -35,7 +35,6 @@ public class RegistraPrenotazioneProceduraDAO {
             //estrazione output della stored procedure 'registraPrenotazione'
             idPrenotazione = cs.getInt(5);
 
-
         } catch (SQLException e) {
             //gestione eccezione dovuta a input errato
             throw new DAOException("Errore nella registrazione prenotazione: " + e.getMessage());

@@ -3,11 +3,10 @@
  */
 package view;
 
-import model.domain.Itinerario;
-import model.domain.TappaNotturna;
+import model.dto.RegistraAutobusAgenziaRequest;
 import model.dto.RegistraEdizioneViaggioRequest;
 import model.dto.RegistraItinerarioRequest;
-import model.dto.RegistraPrenotazioneRequest;
+import model.dto.RegistraAlbergoRequest;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -183,4 +182,98 @@ public class AgenteView {
         System.out.println("*********************************");
         System.out.println("Registrazione edizione di viaggio completata con successo.\n");
     }
+
+
+    //FUNZIONI VIEW RELATIVE OPERAZIONE: AG3 - RegistraAlbergo
+
+    public RegistraAlbergoRequest registraAlbergoRichiedi() {
+
+        //richiesta in input delle informazioni inerenti l'albergo da registrare
+        Scanner input = new Scanner(System.in);
+        System.out.print("\n*** OPERAZIONE DI REGISTRAZIONE ALBERGO ***\n");
+        System.out.print("Nome albergo: ");
+        String nomeAlbergo = input.nextLine();
+        System.out.print("Referente: ");
+        String referente = input.nextLine();
+        System.out.print("Costo per notte ad ospite: ");
+        String stringCostoNotteOspite = input.nextLine();
+        System.out.print("Numero massimo ospiti: ");
+        String stringNumeroMassimoOspiti = input.nextLine();
+        System.out.print("Indirizzo: ");
+        String indirizzo = input.nextLine();
+        System.out.print("Telefono: ");
+        String telefono = input.nextLine();
+        System.out.print("Fax: ");
+        String fax = input.nextLine();
+        System.out.print("Email: ");
+        String email = input.nextLine();
+        System.out.print("Città: ");
+        String citta = input.nextLine();
+
+        try{
+            //conversione formato String->BigDecimal
+            BigDecimal costoNotteOspite = new BigDecimal(stringCostoNotteOspite);
+            //conversione formato String->int
+            int numeroMassimoOspiti = Integer.parseInt(stringNumeroMassimoOspiti);
+
+            //restituzione riferimento alla nuova istanza di record di RegistraAlbergoRequest
+            return new RegistraAlbergoRequest(nomeAlbergo, referente, costoNotteOspite,
+                                              numeroMassimoOspiti, indirizzo, telefono,
+                                              fax, email, citta);
+
+        } catch (NumberFormatException e) {
+            //gestione errore dovuto a formati numerici non validi
+            System.out.println("\nFormato numerico non valido. Utilizzare un valore valido.\n");
+            return null;
+        }
+    }
+
+
+    public void visualizzaEsitoRegistrazioneAlbergo() {
+
+        //stampa a schermo l'esito positivo dell'operazione registraEdizioneViaggio
+        System.out.println("*********************************");
+        System.out.println("Registrazione albergo completata con successo.\n");
+    }
+
+
+    //FUNZIONI VIEW RELATIVE OPERAZIONE: AG4 - RegistraAutobusAgenzia
+
+    public RegistraAutobusAgenziaRequest registraAutobusAgenziaRichiedi() {
+
+        //richiesta in input delle informazioni inerenti l'autobus da registrare
+        Scanner input = new Scanner(System.in);
+        System.out.print("\n*** OPERAZIONE DI REGISTRAZIONE AUTOBUS DELL'AGENZIA ***\n");
+        System.out.print("Costo: ");
+        String stringCostoMezzo = input.nextLine();
+        System.out.print("Capienza: ");
+        String stringCapienza = input.nextLine();
+
+        try{
+            //conversione formato String->BigDecimal
+            BigDecimal costoMezzo = new BigDecimal(stringCostoMezzo);
+            //conversione formato String->int
+            int capienza = Integer.parseInt(stringCapienza);
+
+            //restituzione riferimento alla nuova istanza di record di RegistraAutobusAgenziaRequest
+            return new RegistraAutobusAgenziaRequest(costoMezzo, capienza);
+
+        } catch (NumberFormatException e) {
+            //gestione errore dovuto a formati numerici non validi
+            System.out.println("\nFormato numerico non valido. Utilizzare un valore valido.\n");
+            return null;
+        }
+    }
+
+
+    public void visualizzaIdMezzo(int idMezzo) {
+
+        //stampa a schermo l'esito positivo dell'operazione registraAutobusAgenzia
+        System.out.println("*********************************");
+        System.out.println("Registrazione autobus dell'agenzia completata con successo.");
+        System.out.println("ID prenotazione: " + idMezzo + "\n");
+    }
+
+
+    //FUNZIONI VIEW RELATIVE OPERAZIONE: AG5 - AssociaAutobusAgenzia
 }

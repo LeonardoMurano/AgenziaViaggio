@@ -610,8 +610,89 @@ DELIMITER ;
 
 
 -- -----------------------------------------------------
+-- stored procedure `AgenziaViaggio`.`registraAlbergo`
+-- -----------------------------------------------------
+
+DELIMITER $$
+
+CREATE PROCEDURE registraAlbergo(
+    IN p_nomeAlbergo VARCHAR(100),
+    IN p_referente VARCHAR(100),
+    IN p_costoNotteOspite DECIMAL(10,2),
+    IN p_numeroMassimoOspiti INT,
+    IN p_indirizzo VARCHAR(255),
+    IN p_telefono VARCHAR(20),
+    IN p_fax VARCHAR(20),
+    IN p_email VARCHAR(100),
+    IN p_citta VARCHAR(100)
+)
+BEGIN
+
+    -- inserimento del nuovo Albergo
+    INSERT INTO Albergo (
+        NomeAlbergo,
+        Referente,
+        CostoNotteOspite,
+        NumeroMassimoOspiti,
+        Indirizzo,
+        Telefono,
+        Fax,
+        Email,
+        Citta
+    )
+    VALUES (
+        p_nomeAlbergo,
+        p_referente,
+        p_costoNotteOspite,
+        p_numeroMassimoOspiti,
+        p_indirizzo,
+        p_telefono,
+        p_fax,
+        p_email,
+        p_citta
+    );
+
+END $$
+
+DELIMITER ;
+
+
+-- -----------------------------------------------------
+-- stored procedure `AgenziaViaggio`.`registraAutobusAgenzia`
+-- -----------------------------------------------------
+
+DELIMITER $$
+
+CREATE PROCEDURE registraAutobusAgenzia(
+    IN p_costoMezzo DECIMAL(10,2),
+    IN p_capienza INT,
+    OUT p_idMezzo INT
+)
+BEGIN
+
+    -- inserimento del nuovo AutobusAgenzia
+    -- l'attributo idMezzo è autogenerato nel DB
+    INSERT INTO AutobusAgenzia (
+        CostoMezzo,
+        Capienza
+    )
+    VALUES (
+        p_costoMezzo,
+        p_capienza
+    );
+
+    -- setting valore restituito in output
+    SET p_idMezzo = LAST_INSERT_ID();
+
+END $$
+
+DELIMITER ;
+
+
+-- -----------------------------------------------------
 -- USERS AND PRIVILEGES
 -- -----------------------------------------------------
+
 DROP USER IF EXISTS 'login';
 CREATE USER 'login' IDENTIFIED BY 'login';
 GRANT EXECUTE ON procedure `AgenziaViaggio`.`login` TO 'login';
@@ -625,6 +706,8 @@ DROP USER IF EXISTS 'agente';
 CREATE USER 'agente' IDENTIFIED BY 'agente';
 GRANT EXECUTE ON procedure `AgenziaViaggio`.`registraItinerario` TO 'agente';
 GRANT EXECUTE ON procedure `AgenziaViaggio`.`registraEdizioneViaggio` TO 'agente';
+GRANT EXECUTE ON procedure `AgenziaViaggio`.`registraAlbergo` TO 'agente';
+GRANT EXECUTE ON procedure `AgenziaViaggio`.`registraAutobusAgenzia` TO 'agente';
 
 
 -- -----------------------------------------------------
