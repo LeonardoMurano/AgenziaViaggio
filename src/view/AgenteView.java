@@ -5,9 +5,13 @@ package view;
 
 import model.domain.Itinerario;
 import model.domain.TappaNotturna;
+import model.dto.RegistraEdizioneViaggioRequest;
 import model.dto.RegistraItinerarioRequest;
+import model.dto.RegistraPrenotazioneRequest;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -137,4 +141,46 @@ public class AgenteView {
         System.out.println("Registrazione itinerario completata con successo.\n");
     }
 
+
+    //FUNZIONI VIEW RELATIVE OPERAZIONE: AG2 - RegistraEdizioneViaggio
+
+    public RegistraEdizioneViaggioRequest registraEdizioneViaggioRichiedi(){
+
+        //richiesta in input delle informazioni inerenti l'edizione di viaggio da registrare
+        Scanner input = new Scanner(System.in);
+        System.out.print("\n*** OPERAZIONE DI REGISTRAZIONE EDIZIONE VIAGGIO ***\n");
+        System.out.print("Nome itinerario: ");
+        String nomeItinerario = input.nextLine();
+        System.out.print("Data di partenza: ");
+        String StringDataPartenza = input.nextLine();
+        System.out.print("Costo operativo: ");
+        String StringCostoOperativo = input.nextLine();
+
+        try{
+            //conversione formato String->LocalDate
+            LocalDate dataPartenza = LocalDate.parse(StringDataPartenza);
+            //conversione formato String->BigDecimal
+            BigDecimal costoOperativo = new BigDecimal(StringCostoOperativo);
+
+            //restituzione riferimento alla nuova istanza di record di RegistraEdizioneViaggioRequest
+            return new RegistraEdizioneViaggioRequest(nomeItinerario, dataPartenza, costoOperativo);
+
+        } catch (DateTimeParseException e) {
+            //gestione errore dovuto a formato delle date non valido
+            System.out.println("\nFormato della data non valido. Utilizzare yyyy-MM-dd.\n");
+            return null;
+        } catch (NumberFormatException e) {
+            //gestione errore dovuto a formato del costoOperativo non valido
+            System.out.println("\nFormato del costo Operativo non valido. Utilizzare un valore numerico decimale.\n");
+            return null;
+        }
+    }
+
+
+    public void visualizzaEsitoRegistrazioneEdizioneViaggio() {
+
+        //stampa a schermo l'esito positivo dell'operazione registraEdizioneViaggio
+        System.out.println("*********************************");
+        System.out.println("Registrazione edizione di viaggio completata con successo.\n");
+    }
 }

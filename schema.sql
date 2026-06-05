@@ -552,6 +552,70 @@ DELIMITER ;
 
 
 -- -----------------------------------------------------
+-- stored procedure `AgenziaViaggio`.`registraEdizioneViaggio`
+-- -----------------------------------------------------
+
+DELIMITER $$
+
+CREATE PROCEDURE registraEdizioneViaggio(
+    IN p_nomeItinerario VARCHAR(100),
+    IN p_dataPartenza DATE,
+    IN p_costoOperativo DECIMAL(10,2)
+)
+BEGIN
+
+    -- definizione variabili locali
+    DECLARE v_durataTotale INT;
+    DECLARE v_dataRientro DATE;
+
+    -- verifica che la data della partenza sia tra >=20 giorni:
+    -- vincolo che è diretta conseguenza della regola aziendale secondo la quale
+    -- è possibile effettuare prenotazioni quando mancano >=20 giorni alla partenza
+    IF DATEDIFF(p_dataPartenza, CURRENT_DATE()) < 20 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'La data di partenza deve essere almeno 20 giorni successiva alla data odierna';
+    END IF;
+
+    -- ricavo la durataTotale dell'Itinerario
+    -- COALESCE serve a forzare a 0 SUM(DurataTappa) nel caso in cui essa risulta essere NULL
+    SELECT COALESCE(SUM(DurataTappa), 0)
+    INTO v_durataTotale
+    FROM TappaNotturna
+    WHERE Itinerario = p_nomeItinerario;
+
+    -- verifica se l'Itinerario è valido
+        IF v_durataTotale = 0 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Itinerario senza tappe non valido';
+        END IF;
+
+    -- imposta v_dataRientro = p_dataPartenza + v_durataTotale
+    SET v_dataRientro =
+        DATE_ADD(p_dataPartenza, INTERVAL v_durataTotale DAY);
+
+    -- inserimento della nuova EdizioneViaggioFutura
+    -- al momento della creazione, NumeroOspitiTotale == 0 sempre
+    INSERT INTO EdizioneViaggioFutura (
+        Partenza,
+        Rientro,
+        NumeroOspitiTotale,
+        CostoOperativo,
+        Itinerario
+    )
+    VALUES (
+        p_dataPartenza,
+        v_dataRientro,
+        0,
+        p_costoOperativo,
+        p_nomeItinerario
+    );
+
+END $$
+
+DELIMITER ;
+
+
+-- -----------------------------------------------------
 -- USERS AND PRIVILEGES
 -- -----------------------------------------------------
 DROP USER IF EXISTS 'login';
@@ -566,6 +630,7 @@ GRANT EXECUTE ON procedure `AgenziaViaggio`.`cancellaPrenotazione` TO 'cliente';
 DROP USER IF EXISTS 'agente';
 CREATE USER 'agente' IDENTIFIED BY 'agente';
 GRANT EXECUTE ON procedure `AgenziaViaggio`.`registraItinerario` TO 'agente';
+GRANT EXECUTE ON procedure `AgenziaViaggio`.`registraEdizioneViaggio` TO 'agente';
 
 
 -- -----------------------------------------------------

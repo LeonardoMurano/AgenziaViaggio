@@ -7,7 +7,9 @@ import exception.ApplicationException;
 import exception.ControllerException;
 import exception.DAOException;
 import model.dao.ConnectionFactory;
+import model.dao.RegistraEdizioneViaggioProceduraDAO;
 import model.dao.RegistraItinerarioProceduraDAO;
+import model.dto.RegistraEdizioneViaggioRequest;
 import model.dto.RegistraItinerarioRequest;
 import view.AgenteView;
 import model.enums.Ruolo;
@@ -84,7 +86,27 @@ public class AgenteController implements Controller {
     }
 
 
-    void  RegistraEdizioneViaggio() throws ControllerException {}
+    void  RegistraEdizioneViaggio() throws ControllerException {
+
+        //invoca AgenteView per richiede i dati in input all'agente
+        RegistraEdizioneViaggioRequest request = view.registraEdizioneViaggioRichiedi();
+
+        //verifica che la richiesta sia andata a buon fine
+        if (request == null) {return;}
+        try{
+            //esecuzione procedura di registrazione EdizioneViaggio
+            new RegistraEdizioneViaggioProceduraDAO().execute(request);
+
+            //invoca funzione di stampa a schermo dell'esito positivo
+            view.visualizzaEsitoRegistrazioneEdizioneViaggio();
+
+        } catch (DAOException e) {
+            //gestione errori nella procedura di registrazione edizione di viaggio
+            throw new ControllerException(e.getMessage(), e);
+        }
+    }
+
+
     void  RegistraAlbergo() throws ControllerException {}
     void  RegistraAutobusAgenzia() throws ControllerException {}
     void  AssociaAutobusAgenzia() throws ControllerException {}
