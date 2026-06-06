@@ -19,7 +19,7 @@ USE `AgenziaViaggio` ;
 -- Table `AgenziaViaggio`.`Utente`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`Utente` (
-    `Username` VARCHAR(16) NOT NULL,
+                                                         `Username` VARCHAR(16) NOT NULL,
     `NomeUtente` VARCHAR(100) NOT NULL,
     `CognomeUtente` VARCHAR(100) NOT NULL,
     `Password` VARCHAR(100) NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`Utente` (
 -- Table `AgenziaViaggio`.`Itinerario`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`Itinerario` (
-    `Nome` VARCHAR(100) NOT NULL,
+                                                             `Nome` VARCHAR(100) NOT NULL,
     `CostoItinerario` DECIMAL(10,2) UNSIGNED NOT NULL,
     PRIMARY KEY (`Nome`))
     ENGINE = InnoDB;
@@ -42,10 +42,10 @@ CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`Itinerario` (
 -- Table `AgenziaViaggio`.`EdizioneViaggioPassata`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`EdizioneViaggioPassata` (
-    `Partenza` DATE NOT NULL,
-    `Rientro` DATE NOT NULL,
-    `NumeroOspitiTotale` INT UNSIGNED NOT NULL,
-    `CostoOperativo` DECIMAL(10,2) UNSIGNED NOT NULL,
+                                                                         `Partenza` DATE NOT NULL,
+                                                                         `Rientro` DATE NOT NULL,
+                                                                         `NumeroOspitiTotale` INT UNSIGNED NOT NULL,
+                                                                         `CostoOperativo` DECIMAL(10,2) UNSIGNED NOT NULL,
     `Itinerario` VARCHAR(100) NOT NULL,
     PRIMARY KEY (`Partenza`, `Itinerario`),
     CONSTRAINT `fk_EdizioneViaggioPassata_Itinerario1`
@@ -62,10 +62,10 @@ CREATE INDEX `fk_EdizioneViaggioPassata_Itinerario1_idx` ON `AgenziaViaggio`.`Ed
 -- Table `AgenziaViaggio`.`EdizioneViaggioFutura`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`EdizioneViaggioFutura` (
-    `Partenza` DATE NOT NULL,
-    `Rientro` DATE NOT NULL,
-    `NumeroOspitiTotale` INT UNSIGNED NOT NULL,
-    `CostoOperativo` DECIMAL(10,2) UNSIGNED NOT NULL,
+                                                                        `Partenza` DATE NOT NULL,
+                                                                        `Rientro` DATE NOT NULL,
+                                                                        `NumeroOspitiTotale` INT UNSIGNED NOT NULL,
+                                                                        `CostoOperativo` DECIMAL(10,2) UNSIGNED NOT NULL,
     `Itinerario` VARCHAR(100) NOT NULL,
     PRIMARY KEY (`Partenza`, `Itinerario`),
     CONSTRAINT `fk_EdizioneViaggioPassata_Itinerario10`
@@ -82,9 +82,9 @@ CREATE INDEX `fk_EdizioneViaggioPassata_Itinerario1_idx` ON `AgenziaViaggio`.`Ed
 -- Table `AgenziaViaggio`.`Prenotazione`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`Prenotazione` (
-    `IDprenotazione` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `NumeroOspitiPrenotazione` INT UNSIGNED NOT NULL,
-    `InfoCliente` VARCHAR(16) NOT NULL,
+                                                               `IDprenotazione` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                                                               `NumeroOspitiPrenotazione` INT UNSIGNED NOT NULL,
+                                                               `InfoCliente` VARCHAR(16) NOT NULL,
     `PartenzaP` DATE NULL,
     `ItinerarioP` VARCHAR(100) NULL,
     `PartenzaF` DATE NULL,
@@ -118,8 +118,8 @@ CREATE INDEX `fk_Prenotazione_EdizioneViaggioFutura1_idx` ON `AgenziaViaggio`.`P
 -- Table `AgenziaViaggio`.`AutobusAgenzia`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`AutobusAgenzia` (
-    `IDmezzo` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `CostoMezzo` DECIMAL(10,2) UNSIGNED NOT NULL,
+                                                                 `IDmezzo` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                                                                 `CostoMezzo` DECIMAL(10,2) UNSIGNED NOT NULL,
     `Capienza` INT UNSIGNED NOT NULL,
     PRIMARY KEY (`IDmezzo`))
     ENGINE = InnoDB;
@@ -129,7 +129,7 @@ CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`AutobusAgenzia` (
 -- Table `AgenziaViaggio`.`Citta`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`Citta` (
-    `NomeCitta` VARCHAR(100) NOT NULL,
+                                                        `NomeCitta` VARCHAR(100) NOT NULL,
     PRIMARY KEY (`NomeCitta`))
     ENGINE = InnoDB;
 
@@ -138,9 +138,9 @@ CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`Citta` (
 -- Table `AgenziaViaggio`.`TappaNotturna`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`TappaNotturna` (
-    `Numero` INT UNSIGNED NOT NULL,
-    `DurataTappa` INT UNSIGNED NOT NULL,
-    `Itinerario` VARCHAR(100) NOT NULL,
+                                                                `Numero` INT UNSIGNED NOT NULL,
+                                                                `DurataTappa` INT UNSIGNED NOT NULL,
+                                                                `Itinerario` VARCHAR(100) NOT NULL,
     `Citta` VARCHAR(100) NOT NULL,
     PRIMARY KEY (`Numero`, `Itinerario`),
     CONSTRAINT `fk_TappaNotturna_Itinerario1`
@@ -164,7 +164,7 @@ CREATE INDEX `fk_TappaNotturna_Citta1_idx` ON `AgenziaViaggio`.`TappaNotturna` (
 -- Table `AgenziaViaggio`.`Albergo`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`Albergo` (
-    `NomeAlbergo` VARCHAR(100) NOT NULL,
+                                                          `NomeAlbergo` VARCHAR(100) NOT NULL,
     `Referente` VARCHAR(100) NOT NULL,
     `CostoNotteOspite` DECIMAL(10,2) NOT NULL,
     `NumeroMassimoOspiti` INT NOT NULL,
@@ -190,8 +190,8 @@ CREATE UNIQUE INDEX `Email_UNIQUE` ON `AgenziaViaggio`.`Albergo` (`Email` ASC) V
 -- Table `AgenziaViaggio`.`TramiteP`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`TramiteP` (
-    `Partenza` DATE NOT NULL,
-    `Itinerario` VARCHAR(100) NOT NULL,
+                                                           `Partenza` DATE NOT NULL,
+                                                           `Itinerario` VARCHAR(100) NOT NULL,
     `IDmezzo` INT UNSIGNED NOT NULL,
     PRIMARY KEY (`Partenza`, `Itinerario`, `IDmezzo`),
     CONSTRAINT `fk_TramiteP_EdizioneViaggioPassata1`
@@ -213,8 +213,8 @@ CREATE INDEX `fk_TramiteP_AutobusAgenzia1_idx` ON `AgenziaViaggio`.`TramiteP` (`
 -- Table `AgenziaViaggio`.`TramiteF`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`TramiteF` (
-    `Partenza` DATE NOT NULL,
-    `Itinerario` VARCHAR(100) NOT NULL,
+                                                           `Partenza` DATE NOT NULL,
+                                                           `Itinerario` VARCHAR(100) NOT NULL,
     `IDmezzo` INT UNSIGNED NOT NULL,
     PRIMARY KEY (`Partenza`, `Itinerario`, `IDmezzo`),
     CONSTRAINT `fk_TramiteF_EdizioneViaggioFutura1`
@@ -236,8 +236,8 @@ CREATE INDEX `fk_TramiteF_AutobusAgenzia1_idx` ON `AgenziaViaggio`.`TramiteF` (`
 -- Table `AgenziaViaggio`.`AlloggioP`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`AlloggioP` (
-    `EdizioneViaggio` DATE NOT NULL,
-    `ItinerarioViaggio` VARCHAR(100) NOT NULL,
+                                                            `EdizioneViaggio` DATE NOT NULL,
+                                                            `ItinerarioViaggio` VARCHAR(100) NOT NULL,
     `TappaNotturna` INT UNSIGNED NOT NULL,
     `ItinerarioTappa` VARCHAR(100) NOT NULL,
     `NomeAlbergo` VARCHAR(100) NOT NULL,
@@ -271,8 +271,8 @@ CREATE INDEX `report_alloggioP` ON `AgenziaViaggio`.`AlloggioP` (`EdizioneViaggi
 -- Table `AgenziaViaggio`.`AlloggioF`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`AlloggioF` (
-    `EdizioneViaggio` DATE NOT NULL,
-    `ItinerarioViaggio` VARCHAR(100) NOT NULL,
+                                                            `EdizioneViaggio` DATE NOT NULL,
+                                                            `ItinerarioViaggio` VARCHAR(100) NOT NULL,
     `TappaNotturna` INT UNSIGNED NOT NULL,
     `ItinerarioTappa` VARCHAR(100) NOT NULL,
     `NomeAlbergo` VARCHAR(100) NOT NULL,
@@ -326,24 +326,24 @@ BEGIN
     DECLARE v_ruolo ENUM('Cliente','Agente');
 
     -- ricerca Utente con p_username, p_password e memorizza il suo Ruolo in v_ruolo
-    SELECT Ruolo
-    INTO v_ruolo
-    FROM Utente
-    WHERE Username = p_username
-    AND Password = p_password;
+SELECT Ruolo
+INTO v_ruolo
+FROM Utente
+WHERE Username = p_username
+  AND Password = p_password;
 
-    -- se non trova nulla (v_ruolo==NULL), viene sollevata una SQLException
-    IF v_ruolo IS NULL THEN
+-- se non trova nulla (v_ruolo==NULL), viene sollevata una SQLException
+IF v_ruolo IS NULL THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Credenziali non valide';
-    END IF;
+END IF;
 
     -- mapping ENUM->INT, per la costruzione dell'output p_ruolo
     IF v_ruolo = 'Cliente' THEN
         SET p_ruolo = 1;
     ELSEIF v_ruolo = 'Agente' THEN
         SET p_ruolo = 2;
-    END IF;
+END IF;
 
 END$$
 
@@ -369,7 +369,7 @@ BEGIN
     IF p_numeroOspiti <= 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Numero ospiti non valido';
-    END IF;
+END IF;
 
     -- implementazione regola aziendale:
     -- verifica che la prenotazione sia inerente un viaggio con partenza prevista tra >=20 giorni
@@ -377,32 +377,32 @@ BEGIN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT =
             'Prenotazione non consentita: meno di 20 giorni alla partenza';
-    END IF;
+END IF;
 
 
     -- inserisce in Prenotazione la tupla definita dai valori in input:
     -- una nuova prenotazione deve sempre riferirsi ad una EdizioneViaggioFutura dunque si forzano PartenzaP, ItinerarioP a NULL
     -- idPrenotazione è autogenerato: viene omesso nell'INSERT
-    INSERT INTO Prenotazione (
-        NumeroOspitiPrenotazione,
-        InfoCliente,
-        PartenzaP,
-        ItinerarioP,
-        PartenzaF,
-        ItinerarioF
-    )
-    VALUES (
-        p_numeroOspiti,
-        p_username,
-        NULL,
-        NULL,
-        p_partenzaF,
-        p_itinerarioF
-    );
+INSERT INTO Prenotazione (
+    NumeroOspitiPrenotazione,
+    InfoCliente,
+    PartenzaP,
+    ItinerarioP,
+    PartenzaF,
+    ItinerarioF
+)
+VALUES (
+           p_numeroOspiti,
+           p_username,
+           NULL,
+           NULL,
+           p_partenzaF,
+           p_itinerarioF
+       );
 
-    -- ritorna al chiamante idPrenotazione che è autogenerato nella BD
-    -- LAST_INSERT_ID() è specifico della connessione corrente: non è necessario implementare una transazione
-    SET p_idPrenotazione = LAST_INSERT_ID();
+-- ritorna al chiamante idPrenotazione che è autogenerato nella BD
+-- LAST_INSERT_ID() è specifico della connessione corrente: non è necessario implementare una transazione
+SET p_idPrenotazione = LAST_INSERT_ID();
 
 END$$
 
@@ -431,24 +431,24 @@ BEGIN
     SET v_cliente = NULL;
 
     -- recupera i dati della prenotazione in base ad p_idPrenotazione
-    SELECT InfoCliente, PartenzaF
-    INTO v_cliente, v_partenza
-    FROM Prenotazione
-    WHERE IDprenotazione = p_idPrenotazione;
+SELECT InfoCliente, PartenzaF
+INTO v_cliente, v_partenza
+FROM Prenotazione
+WHERE IDprenotazione = p_idPrenotazione;
 
-    -- verifica se la prenotazione esiste
-    -- se la prenotazione non esiste, allora v_cliente==NULL
-    IF v_cliente IS NULL THEN
+-- verifica se la prenotazione esiste
+-- se la prenotazione non esiste, allora v_cliente==NULL
+IF v_cliente IS NULL THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Prenotazione inesistente';
-    END IF;
+END IF;
 
     -- implementazione regola aziendale:
     -- verifica che la prenotazione appartenga al cliente che ne richiede la cancellazione
     IF v_cliente <> p_username THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'La prenotazione non appartiene al cliente';
-    END IF;
+END IF;
 
     -- implementazione regola aziendale:
     -- verifica che la prenotazione sia inerente un viaggio con partenza prevista tra >=20 giorni
@@ -456,11 +456,11 @@ BEGIN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT =
             'Cancellazione non consentita: meno di 20 giorni alla partenza';
-    END IF;
+END IF;
 
     -- cancellazione della prenotazione identificata da p_idPrenotazione
-    DELETE FROM Prenotazione
-    WHERE IDprenotazione = p_idPrenotazione;
+DELETE FROM Prenotazione
+WHERE IDprenotazione = p_idPrenotazione;
 
 END$$
 
@@ -493,17 +493,17 @@ BEGIN
     IF p_tappe IS NULL OR LENGTH(TRIM(p_tappe)) = 0 OR LOCATE(':', p_tappe) = 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Serve almeno una tappa valida';
-    END IF;
+END IF;
 
 
     -- registrazione Itinerario
-    INSERT INTO Itinerario (Nome, CostoItinerario)
-    VALUES (p_nomeItinerario, p_costo);
+INSERT INTO Itinerario (Nome, CostoItinerario)
+VALUES (p_nomeItinerario, p_costo);
 
-    -- parsing delle tappe (separate da ';')
+-- parsing delle tappe (separate da ';')
 
-    -- continua fino a quando ci sono tappe da leggere
-    WHILE LENGTH(p_tappe) > 0 DO
+-- continua fino a quando ci sono tappe da leggere
+WHILE LENGTH(p_tappe) > 0 DO
         -- cerca il prossimo blocco (i blocchi sono separati da ';')
         SET v_pos = LOCATE(';', p_tappe);
         -- se non viene trovato nessun ';' allora è l'ultimo blocco:
@@ -512,12 +512,12 @@ BEGIN
             SET v_token = p_tappe;
             SET p_tappe = '';
         -- se viene trovato un ';' allora è un blocco intermedio:
-        ELSE
+ELSE
             -- estrae solo la sottostringa di p_tappe che precede ';'
             SET v_token = SUBSTRING(p_tappe, 1, v_pos - 1);
             -- aggiorna la stringa p_tappe eliminando la parte appena letta
             SET p_tappe = SUBSTRING(p_tappe, v_pos + 1);
-        END IF;
+END IF;
 
         -- parsing interno numero:durata:citta
 
@@ -530,21 +530,21 @@ BEGIN
         SET v_citta  = SUBSTRING_INDEX(v_token, ':', -1);
 
         -- inserimento tappa i-esimaa estratta da input serializzato
-        INSERT INTO TappaNotturna (
-            numero,
-            durataTappa,
-            itinerario,
-            citta
+INSERT INTO TappaNotturna (
+    numero,
+    durataTappa,
+    itinerario,
+    citta
 
-        )
-        VALUES (
+)
+VALUES (
            v_numero,
            v_durata,
            p_nomeItinerario,
            v_citta
 
-        );
-    END WHILE;
+       );
+END WHILE;
 
 END$$
 
@@ -574,35 +574,35 @@ BEGIN
     IF DATEDIFF(p_dataPartenza, CURRENT_DATE()) < 20 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'La data di partenza deve essere almeno 20 giorni successiva alla data odierna';
-    END IF;
+END IF;
 
     -- ricavo la durataTotale dell'Itinerario
     -- COALESCE serve a forzare a 0 SUM(DurataTappa) nel caso in cui essa risulta essere NULL
-    SELECT COALESCE(SUM(DurataTappa), 0)
-    INTO v_durataTotale
-    FROM TappaNotturna
-    WHERE Itinerario = p_nomeItinerario;
+SELECT COALESCE(SUM(DurataTappa), 0)
+INTO v_durataTotale
+FROM TappaNotturna
+WHERE Itinerario = p_nomeItinerario;
 
-    -- imposta v_dataRientro = p_dataPartenza + v_durataTotale
-    SET v_dataRientro =
+-- imposta v_dataRientro = p_dataPartenza + v_durataTotale
+SET v_dataRientro =
         DATE_ADD(p_dataPartenza, INTERVAL v_durataTotale DAY);
 
     -- inserimento della nuova EdizioneViaggioFutura
     -- al momento della creazione, NumeroOspitiTotale == 0 sempre
-    INSERT INTO EdizioneViaggioFutura (
-        Partenza,
-        Rientro,
-        NumeroOspitiTotale,
-        CostoOperativo,
-        Itinerario
-    )
-    VALUES (
-        p_dataPartenza,
-        v_dataRientro,
-        0,
-        p_costoOperativo,
-        p_nomeItinerario
-    );
+INSERT INTO EdizioneViaggioFutura (
+    Partenza,
+    Rientro,
+    NumeroOspitiTotale,
+    CostoOperativo,
+    Itinerario
+)
+VALUES (
+           p_dataPartenza,
+           v_dataRientro,
+           0,
+           p_costoOperativo,
+           p_nomeItinerario
+       );
 
 END $$
 
@@ -629,28 +629,28 @@ CREATE PROCEDURE registraAlbergo(
 BEGIN
 
     -- inserimento del nuovo Albergo
-    INSERT INTO Albergo (
-        NomeAlbergo,
-        Referente,
-        CostoNotteOspite,
-        NumeroMassimoOspiti,
-        Indirizzo,
-        Telefono,
-        Fax,
-        Email,
-        Citta
-    )
-    VALUES (
-        p_nomeAlbergo,
-        p_referente,
-        p_costoNotteOspite,
-        p_numeroMassimoOspiti,
-        p_indirizzo,
-        p_telefono,
-        p_fax,
-        p_email,
-        p_citta
-    );
+INSERT INTO Albergo (
+    NomeAlbergo,
+    Referente,
+    CostoNotteOspite,
+    NumeroMassimoOspiti,
+    Indirizzo,
+    Telefono,
+    Fax,
+    Email,
+    Citta
+)
+VALUES (
+           p_nomeAlbergo,
+           p_referente,
+           p_costoNotteOspite,
+           p_numeroMassimoOspiti,
+           p_indirizzo,
+           p_telefono,
+           p_fax,
+           p_email,
+           p_citta
+       );
 
 END $$
 
@@ -672,17 +672,17 @@ BEGIN
 
     -- inserimento del nuovo AutobusAgenzia
     -- l'attributo idMezzo è autogenerato nel DB
-    INSERT INTO AutobusAgenzia (
-        CostoMezzo,
-        Capienza
-    )
-    VALUES (
-        p_costoMezzo,
-        p_capienza
-    );
+INSERT INTO AutobusAgenzia (
+    CostoMezzo,
+    Capienza
+)
+VALUES (
+           p_costoMezzo,
+           p_capienza
+       );
 
-    -- setting valore restituito in output
-    SET p_idMezzo = LAST_INSERT_ID();
+-- setting valore restituito in output
+SET p_idMezzo = LAST_INSERT_ID();
 
 END $$
 
@@ -712,12 +712,12 @@ BEGIN
     IF DATEDIFF(p_partenza, CURDATE()) < 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Data di partenza già trascorsa';
-    END IF;
+END IF;
 
     IF DATEDIFF(p_partenza, CURDATE()) > 20 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Associazione non consentita: più di 20 giorni alla partenza';
-    END IF;
+END IF;
 
     -- implementazione regola aziendale:
     -- verifica se esiste l'EdizioneViaggioFutura ricercata
@@ -729,15 +729,15 @@ BEGIN
     ) THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'EdizioneViaggioFutura non trovata';
-    END IF;
+END IF;
     -- recupera la data di Rientro da EdizioneViaggioFutura
-    SELECT Rientro
-    INTO v_rientro
-    FROM EdizioneViaggioFutura
-    WHERE Partenza = p_partenza
-      AND Itinerario = p_itinerario;
-    -- verifica se AutobusAgenzia è associato ad almeno un'altra EdizioneViaggioFutura sovrapposta a quella attuale
-    IF EXISTS (
+SELECT Rientro
+INTO v_rientro
+FROM EdizioneViaggioFutura
+WHERE Partenza = p_partenza
+  AND Itinerario = p_itinerario;
+-- verifica se AutobusAgenzia è associato ad almeno un'altra EdizioneViaggioFutura sovrapposta a quella attuale
+IF EXISTS (
         SELECT 1
         FROM TramiteF TF
         JOIN EdizioneViaggioFutura EV
@@ -751,32 +751,32 @@ BEGIN
     ) THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Autobus già assegnato a un viaggio sovrapposto';
-    END IF;
+END IF;
 
     -- inserimento nuova occorrenza di TramiteF
-    INSERT INTO TramiteF (Partenza, Itinerario, IDmezzo)
-    VALUES (p_partenza, p_itinerario, p_idmezzo);
+INSERT INTO TramiteF (Partenza, Itinerario, IDmezzo)
+VALUES (p_partenza, p_itinerario, p_idmezzo);
 
-    -- calcolo della capienza totale (sommatoria delle capienze di ogni Autobus associato all'EdizioneViaggioFutura)
-    -- COALESCE(., 0) sostituisce al risultato NULL il valore 0
-    SELECT COALESCE(SUM(A.Capienza), 0)
-    INTO p_capienzaTotale
-    FROM TramiteF TF
-    JOIN AutobusAgenzia A ON A.IDmezzo = TF.IDmezzo
-    WHERE TF.Partenza = p_partenza
-      AND TF.Itinerario = p_itinerario;
+-- calcolo della capienza totale (sommatoria delle capienze di ogni Autobus associato all'EdizioneViaggioFutura)
+-- COALESCE(., 0) sostituisce al risultato NULL il valore 0
+SELECT COALESCE(SUM(A.Capienza), 0)
+INTO p_capienzaTotale
+FROM TramiteF TF
+         JOIN AutobusAgenzia A ON A.IDmezzo = TF.IDmezzo
+WHERE TF.Partenza = p_partenza
+  AND TF.Itinerario = p_itinerario;
 
-    -- recupero da EdizioneViaggioFutura del NumeroOspitiTotale
-    SELECT NumeroOspitiTotale
-    INTO p_numeroOspitiTotale
-    FROM EdizioneViaggioFutura
-    WHERE Partenza = p_partenza
-      AND Itinerario = p_itinerario;
+-- recupero da EdizioneViaggioFutura del NumeroOspitiTotale
+SELECT NumeroOspitiTotale
+INTO p_numeroOspitiTotale
+FROM EdizioneViaggioFutura
+WHERE Partenza = p_partenza
+  AND Itinerario = p_itinerario;
 
 
-    -- implementazione regola aziendale:
-    -- l'output restituito serve ad implementare la stampa di un warning nel caso in cui:
-    -- p_numeroOspitiTotale > p_capienzaTotale
+-- implementazione regola aziendale:
+-- l'output restituito serve ad implementare la stampa di un warning nel caso in cui:
+-- p_numeroOspitiTotale > p_capienzaTotale
 
 END $$
 
@@ -809,101 +809,108 @@ BEGIN
 
     -- verifica esistenza edizione futura
     -- controllo necessario per evitare messaggio di errore grezzo
-    SELECT COUNT(*)
-    INTO v_count
-    FROM EdizioneViaggioFutura EV
-    WHERE EV.Itinerario = p_itinerario
-      AND EV.Partenza = p_partenza;
+SELECT COUNT(*)
+INTO v_count
+FROM EdizioneViaggioFutura EV
+WHERE EV.Itinerario = p_itinerario
+  AND EV.Partenza = p_partenza;
 
-    IF v_count = 0 THEN
+IF v_count = 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT =
         'Edizione di viaggio inesistente';
-    END IF;
+END IF;
+
+    -- implementazione regola aziendale:
+    -- verifica che che l'associazione sia inerente un'EdizioneViaggioFutura con partenza prevista tra 0 e 20 giorni
+   IF DATEDIFF(p_partenza, CURDATE()) > 20 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Associazione non consentita: più di 20 giorni alla partenza';
+END IF;
 
     -- implementazione regola aziendale:
     -- verifica se la tappa per la quale si effettua l'associazione appartiene all'itinerario di EdizioneViaggioFutura
-    SELECT COUNT(*)
-    INTO v_count
-    FROM TappaNotturna TN
-    WHERE TN.Numero = p_numeroTappa
-      AND TN.Itinerario = p_itinerario;
+SELECT COUNT(*)
+INTO v_count
+FROM TappaNotturna TN
+WHERE TN.Numero = p_numeroTappa
+  AND TN.Itinerario = p_itinerario;
 
-    IF v_count = 0 THEN
+IF v_count = 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT =
         'La tappa non appartiene all''itinerario dell''edizione';
-    END IF;
+END IF;
 
 
     -- implementazione regola aziendale:
     -- recupero della città della TappaNotturna
-    SELECT TN.Citta
-    INTO v_cittaTappa
-    FROM TappaNotturna TN
-    WHERE TN.Numero = p_numeroTappa
-      AND TN.Itinerario = p_itinerario;
-    --verifica l'esistenza dell'Albergo
-    SELECT COUNT(*)
-    INTO v_count
-    FROM Albergo A
-    WHERE A.NomeAlbergo = p_nomeAlbergo
-      AND A.Citta = p_citta;
+SELECT TN.Citta
+INTO v_cittaTappa
+FROM TappaNotturna TN
+WHERE TN.Numero = p_numeroTappa
+  AND TN.Itinerario = p_itinerario;
+-- verifica l'esistenza dell'Albergo
+SELECT COUNT(*)
+INTO v_count
+FROM Albergo A
+WHERE A.NomeAlbergo = p_nomeAlbergo
+  AND A.Citta = p_citta;
 
-    IF v_count = 0 THEN
+IF v_count = 0 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Albergo inesistente';
-    END IF;
+END IF;
     -- recupero della città dell'Albergo
-    SELECT A.Citta
-    INTO v_cittaAlbergo
-    FROM Albergo A
-    WHERE A.NomeAlbergo = p_nomeAlbergo
-      AND A.Citta = p_citta;
-    -- verifica se la città in cui si svolge TappaNotturna è uguale a quella dell'Albergo
-    IF v_cittaTappa <> v_cittaAlbergo THEN
+SELECT A.Citta
+INTO v_cittaAlbergo
+FROM Albergo A
+WHERE A.NomeAlbergo = p_nomeAlbergo
+  AND A.Citta = p_citta;
+-- verifica se la città in cui si svolge TappaNotturna è uguale a quella dell'Albergo
+IF v_cittaTappa <> v_cittaAlbergo THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT =
         'L''albergo deve appartenere alla stessa città della tappa';
-    END IF;
+END IF;
 
     -- implementazione regola aziendale:
     -- recupero del NumeroOspitiTotale dell'EdizioneViaggioFutura
-    SELECT EV.NumeroOspitiTotale
-    INTO v_numeroOspiti
-    FROM EdizioneViaggioFutura EV
-    WHERE EV.Itinerario = p_itinerario
-      AND EV.Partenza = p_partenza;
-    -- recupero della NumeroMassimoOspiti dell'Albergo
-    SELECT A.NumeroMassimoOspiti
-    INTO v_capienzaAlbergo
-    FROM Albergo A
-    WHERE A.NomeAlbergo = p_nomeAlbergo
-      AND A.Citta = p_citta;
-    -- verifica se NumeroMassimoOspiti > NumeroOspitiTotale
-    IF v_capienzaAlbergo <= v_numeroOspiti THEN
+SELECT EV.NumeroOspitiTotale
+INTO v_numeroOspiti
+FROM EdizioneViaggioFutura EV
+WHERE EV.Itinerario = p_itinerario
+  AND EV.Partenza = p_partenza;
+-- recupero del NumeroMassimoOspiti dell'Albergo
+SELECT A.NumeroMassimoOspiti
+INTO v_capienzaAlbergo
+FROM Albergo A
+WHERE A.NomeAlbergo = p_nomeAlbergo
+  AND A.Citta = p_citta;
+-- verifica se NumeroMassimoOspiti > NumeroOspitiTotale
+IF v_capienzaAlbergo <= v_numeroOspiti THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT =
         'Capienza dell''albergo insufficiente';
-    END IF;
+END IF;
 
     -- inserimento nuova occorrenza di AlloggioF
-    INSERT INTO AlloggioF(
-        EdizioneViaggio,
-        ItinerarioViaggio,
-        TappaNotturna,
-        ItinerarioTappa,
-        NomeAlbergo,
-        Citta
-    )
-    VALUES(
-        p_partenza,
-        p_itinerario,
-        p_numeroTappa,
-        p_itinerario,
-        p_nomeAlbergo,
-        p_citta
-    );
+INSERT INTO AlloggioF(
+    EdizioneViaggio,
+    ItinerarioViaggio,
+    TappaNotturna,
+    ItinerarioTappa,
+    NomeAlbergo,
+    Citta
+)
+VALUES(
+          p_partenza,
+          p_itinerario,
+          p_numeroTappa,
+          p_itinerario,
+          p_nomeAlbergo,
+          p_citta
+      );
 
 END$$
 
@@ -1007,13 +1014,13 @@ INSERT INTO AutobusAgenzia (CostoMezzo, Capienza) VALUES
                                                       (6000,55);
 
 INSERT INTO EdizioneViaggioFutura VALUES
-                                      ('2026-06-20','2026-06-25',0,3800,'Dolomiti'),
-                                      ('2026-06-23','2026-06-30',275,4200,'RomaClassica'),
-                                      ('2026-06-26','2026-07-03',120,3800,'LaghiNord'),
+                                      ('2026-06-20','2026-06-25',60,3800,'Dolomiti'),
+                                      ('2026-06-23','2026-06-30',115,4200,'RomaClassica'),
+                                      ('2026-06-26','2026-07-03',90,3800,'LaghiNord'),
+
                                       ('2026-07-01','2026-07-10',0,5000,'ItaliaNord'),
                                       ('2026-07-05','2026-07-12',0,4800,'ItaliaSud'),
                                       ('2026-07-10','2026-07-18',0,4200,'ArteToscana'),
-                                      ('2026-07-15','2026-07-22',0,4000,'LaghiNord'),
                                       ('2026-07-20','2026-07-28',0,3800,'CittaVenete'),
                                       ('2026-08-01','2026-08-10',0,6000,'SiciliaTour'),
                                       ('2026-08-05','2026-08-12',0,3000,'RomaClassica'),
@@ -1045,44 +1052,25 @@ INSERT INTO EdizioneViaggioPassata VALUES
 
 INSERT INTO TappaNotturna VALUES
                               (1,2,'Dolomiti','Milano'),
-                              (2,2,'Dolomiti','Parma'),
+                              (2,2,'Dolomiti','Verona'),
                               (3,1,'Dolomiti','Torino'),
-                              (1,7,'RomaClassica','Milano'),
+                              (1,7,'RomaClassica','Roma'),
                               (1,4,'LaghiNord','Venezia'),
-                              (2,3,'LaghiNord','Firenze'),
+                              (2,3,'LaghiNord','Verona'),
 
                               (1,5,'ItaliaNord','Milano'),
                               (2,4,'ItaliaNord','Torino'),
                               (1,7,'ItaliaSud','Napoli'),
                               (1,8,'ArteToscana','Firenze'),
-                              (1,7,'LaghiNord','Verona'),
                               (1,8,'CittaVenete','Venezia'),
                               (1,9,'SiciliaTour','Palermo'),
-                              (1,7,'RomaClassica','Roma'),
                               (1,8,'Costiera','Napoli'),
                               (1,7,'FoodTour','Parma'),
                               (1,8,'MareAdriatico','Bari'),
                               (1,9,'MareTirreno','Genova'),
-                              (1,10,'Dolomiti','Verona'),
                               (1,8,'PugliaTour','Lecce'),
                               (1,7,'EmiliaRomagna','Bologna'),
-                              (1,10,'GrandTourItalia','Roma'),
-
-                              (1,9,'ItaliaNord','Milano'),
-                              (1,7,'ItaliaSud','Lecce'),
-                              (1,8,'ArteToscana','Verona'),
-                              (1,7,'LaghiNord','Firenze'),
-                              (1,8,'CittaVenete','Parma'),
-                              (1,9,'SiciliaTour','Palermo'),
-                              (1,7,'RomaClassica','Roma'),
-                              (1,8,'Costiera','Palermo'),
-                              (1,7,'FoodTour','Napoli'),
-                              (1,8,'MareAdriatico','Siena'),
-                              (1,9,'MareTirreno','Lecce'),
-                              (1,10,'Dolomiti','Milano'),
-                              (1,8,'PugliaTour','Palermo'),
-                              (1,7,'EmiliaRomagna','Parma'),
-                              (1,10,'GranTourItalia','Roma');
+                              (1,10,'GrandTourItalia','Roma');
 
 INSERT INTO Albergo VALUES
                         ('Hotel Milano','Marco',100,100,'Via Roma 1','111','111','milano@h.it','Milano'),
@@ -1090,8 +1078,10 @@ INSERT INTO Albergo VALUES
                         ('Hotel Napoli','Marco',80,90,'Via Napoli 1','333','333','napoli@h.it','Napoli'),
                         ('Hotel Firenze','Marco',120,70,'Via Firenze 1','444','444','firenze@h.it','Firenze'),
                         ('Hotel Venezia','Marco',150,60,'Via Venezia 1','555','555','venezia@h.it','Venezia'),
+                        ('Grande Hotel Venezia','Marco',330,220,'Via Venezia 1','555','555','venezia@h.it','Venezia'),
                         ('Hotel Palermo','Marco',110,85,'Via Palermo 1','666','666','palermo@h.it','Palermo'),
                         ('Hotel Roma','Marco',130,120,'Via Roma 2','777','777','roma@h.it','Roma'),
+                        ('Grande Hotel Roma','Marco',450,260,'Via Roma 4','707','707','granroma@h.it','Roma'),
                         ('Hotel Bari','Marco',95,75,'Via Bari 1','888','888','bari@h.it','Bari'),
                         ('Hotel Lecce','Marco',85,60,'Via Lecce 1','999','999','lecce@h.it','Lecce'),
                         ('Hotel Parma','Marco',90,65,'Via Parma 1','101','101','parma@h.it','Parma'),
@@ -1137,21 +1127,11 @@ INSERT INTO TramiteP VALUES
                          ('2025-03-20','GrandTourItalia',15);
 
 INSERT INTO TramiteF VALUES
-                         ('2026-07-01','ItaliaNord',1),
-                         ('2026-07-05','ItaliaSud',2),
-                         ('2026-07-10','ArteToscana',3),
-                         ('2026-07-15','LaghiNord',4),
-                         ('2026-07-20','CittaVenete',5),
-                         ('2026-08-01','SiciliaTour',6),
-                         ('2026-08-05','RomaClassica',7),
-                         ('2026-08-10','Costiera',8),
-                         ('2026-08-15','FoodTour',9),
-                         ('2026-08-20','MareAdriatico',10),
-                         ('2026-09-01','MareTirreno',11),
-                         ('2026-09-05','Dolomiti',12),
-                         ('2026-09-10','PugliaTour',13),
-                         ('2026-09-15','EmiliaRomagna',14),
-                         ('2026-09-20','GrandTourItalia',15);
+    ('2026-06-20','Dolomiti',12);
+-- TramiteF inerenti:
+-- ('2026-06-23','2026-06-30',275,4200,'RomaClassica'),
+-- ('2026-06-26','2026-07-03',120,3800,'LaghiNord')
+-- non sono volutamente ancora stati inseriti
 
 INSERT INTO AlloggioP VALUES
                           ('2025-01-01','ItaliaNord',1,'ItaliaNord','Hotel Milano','Milano'),
@@ -1171,18 +1151,10 @@ INSERT INTO AlloggioP VALUES
                           ('2025-03-15','EmiliaRomagna',1,'EmiliaRomagna','Hotel Bologna','Bologna');
 
 INSERT INTO AlloggioF VALUES
-                          ('2026-07-01','ItaliaNord',1,'ItaliaNord','Hotel Milano','Milano'),
-                          ('2026-07-01','ItaliaNord',2,'ItaliaNord','Hotel Torino','Torino'),
-                          ('2026-07-05','ItaliaSud',1,'ItaliaSud','Hotel Napoli','Napoli'),
-                          ('2026-07-10','ArteToscana',1,'ArteToscana','Hotel Firenze','Firenze'),
-                          ('2026-07-15','LaghiNord',1,'LaghiNord','Hotel Verona','Verona'),
-                          ('2026-07-20','CittaVenete',1,'CittaVenete','Hotel Venezia','Venezia'),
-                          ('2026-08-01','SiciliaTour',1,'SiciliaTour','Hotel Palermo','Palermo'),
-                          ('2026-08-05','RomaClassica',1,'RomaClassica','Hotel Roma','Roma'),
-                          ('2026-08-10','Costiera',1,'Costiera','Hotel Napoli','Napoli'),
-                          ('2026-08-15','FoodTour',1,'FoodTour','Hotel Parma','Parma'),
-                          ('2026-08-20','MareAdriatico',1,'MareAdriatico','Hotel Bari','Bari'),
-                          ('2026-09-01','MareTirreno',1,'MareTirreno','Hotel Genova','Genova'),
-                          ('2026-09-05','Dolomiti',1,'Dolomiti','Hotel Verona','Verona'),
-                          ('2026-09-10','PugliaTour',1,'PugliaTour','Hotel Lecce','Lecce'),
-                          ('2026-09-15','EmiliaRomagna',1,'EmiliaRomagna','Hotel Bologna','Bologna');
+                          ('2026-06-20','Dolomiti',1,'Dolomiti','Hotel Milano','Milano'),
+                          ('2026-06-20','Dolomiti',2,'Dolomiti','Hotel Verona','Verona'),
+                          ('2026-06-20','Dolomiti',3,'Dolomiti','Hotel Torino','Torino');
+-- AlloggioF inerenti:
+-- ('2026-06-23','2026-06-30',275,4200,'RomaClassica'),
+-- ('2026-06-26','2026-07-03',120,3800,'LaghiNord')
+-- non sono volutamente ancora stati inseriti
