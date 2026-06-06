@@ -307,7 +307,7 @@ public class AgenteView {
     }
 
 
-    public void visualizzaEsitoAssociazioneAlbergo(AssociaAutobusAgenziaOutput output) {
+    public void visualizzaEsitoAssociazioneAutobusAgenzia(AssociaAutobusAgenziaOutput output) {
 
         //estrazione del contenuto di AssociaAutobusAgenziaOutput
         int capienzaTotale = output.capienzaTotale();
@@ -330,5 +330,52 @@ public class AgenteView {
             System.out.println("Capienza totale autobus associati: " + capienzaTotale);
             System.out.println("Capienza totale richiesta autobus associati: " + capienzaRichiesta + "\n");
         }
+    }
+
+
+    //FUNZIONI VIEW RELATIVE OPERAZIONE: AG6 - AssociaAlbergo
+
+    public AssociaAlbergoRequest associaAlbergoRichiedi() {
+
+        //richiesta in input delle informazioni inerenti l'albergo da associare
+        Scanner input = new Scanner(System.in);
+        System.out.print("\n*** OPERAZIONE DI ASSOCIAZIONE ALBERGO - TAPPA NOTTURNA ***\n");
+        System.out.print("Itinerario dell'edizione: ");
+        String itinerario = input.nextLine();
+        System.out.print("Data di partenza: ");
+        String stringDataPartenza = input.nextLine();
+        System.out.print("Numero della tappa notturna: ");
+        String stringNumeroTappa = input.nextLine();
+        System.out.print("Città: ");
+        String citta  = input.nextLine();
+        System.out.print("Nome albergo da associare: ");
+        String nomeAlbergo = input.nextLine();
+
+        try{
+            //conversione formato String->LocalDate
+            LocalDate dataPartenza = LocalDate.parse(stringDataPartenza);
+            //conversione formato String->int
+            int numeroTappa = Integer.parseInt(stringNumeroTappa);
+
+            //restituzione riferimento alla nuova istanza di record di AssociaAlbergoRequest
+            return new AssociaAlbergoRequest(itinerario, dataPartenza, numeroTappa, citta, nomeAlbergo);
+
+        } catch (NumberFormatException e) {
+            //gestione errore dovuto a formati numerici non validi
+            System.out.println("\nFormato numerico non valido. Utilizzare un valore valido.\n");
+            return null;
+        } catch (DateTimeParseException e) {
+            //gestione errore dovuto a formato delle date non valido
+            System.out.println("\nFormato della data non valido. Utilizzare yyyy-MM-dd.\n");
+            return null;
+        }
+    }
+
+
+    public void visualizzaEsitoAssociazioneAlbergo() {
+
+        //stampa a schermo l'esito positivo dell'operazione associaAlbergo
+        System.out.println("*********************************");
+        System.out.println("Associazione albergo completata con successo.\n");
     }
 }

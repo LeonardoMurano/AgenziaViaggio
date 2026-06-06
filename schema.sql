@@ -784,6 +784,133 @@ DELIMITER ;
 
 
 -- -----------------------------------------------------
+-- stored procedure `AgenziaViaggio`.`associaAlbergo`
+-- -----------------------------------------------------
+
+DELIMITER $$
+
+CREATE PROCEDURE associaAlbergo(
+    IN p_itinerario VARCHAR(100),
+    IN p_partenza DATE,
+    IN p_numeroTappa INT,
+    IN p_citta VARCHAR(100),
+    IN p_nomeAlbergo VARCHAR(100)
+)
+BEGIN
+
+    -- dichiarazione variabili locali
+    DECLARE v_cittaTappa VARCHAR(100);
+    DECLARE v_cittaAlbergo VARCHAR(100);
+
+    DECLARE v_numeroOspiti INT;
+    DECLARE v_capienzaAlbergo INT;
+
+    DECLARE v_count INT;
+
+    -- verifica esistenza edizione futura
+    -- controllo necessario per evitare messaggio di errore grezzo
+    SELECT COUNT(*)
+    INTO v_count
+    FROM EdizioneViaggioFutura EV
+    WHERE EV.Itinerario = p_itinerario
+      AND EV.Partenza = p_partenza;
+
+    IF v_count = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT =
+        'Edizione di viaggio inesistente';
+    END IF;
+
+    -- implementazione regola aziendale:
+    -- verifica se la tappa per la quale si effettua l'associazione appartiene all'itinerario di EdizioneViaggioFutura
+    SELECT COUNT(*)
+    INTO v_count
+    FROM TappaNotturna TN
+    WHERE TN.Numero = p_numeroTappa
+      AND TN.Itinerario = p_itinerario;
+
+    IF v_count = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT =
+        'La tappa non appartiene all''itinerario dell''edizione';
+    END IF;
+
+
+    -- implementazione regola aziendale:
+    -- recupero della città della TappaNotturna
+    SELECT TN.Citta
+    INTO v_cittaTappa
+    FROM TappaNotturna TN
+    WHERE TN.Numero = p_numeroTappa
+      AND TN.Itinerario = p_itinerario;
+    --verifica l'esistenza dell'Albergo
+    SELECT COUNT(*)
+    INTO v_count
+    FROM Albergo A
+    WHERE A.NomeAlbergo = p_nomeAlbergo
+      AND A.Citta = p_citta;
+
+    IF v_count = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Albergo inesistente';
+    END IF;
+    -- recupero della città dell'Albergo
+    SELECT A.Citta
+    INTO v_cittaAlbergo
+    FROM Albergo A
+    WHERE A.NomeAlbergo = p_nomeAlbergo
+      AND A.Citta = p_citta;
+    -- verifica se la città in cui si svolge TappaNotturna è uguale a quella dell'Albergo
+    IF v_cittaTappa <> v_cittaAlbergo THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT =
+        'L''albergo deve appartenere alla stessa città della tappa';
+    END IF;
+
+    -- implementazione regola aziendale:
+    -- recupero del NumeroOspitiTotale dell'EdizioneViaggioFutura
+    SELECT EV.NumeroOspitiTotale
+    INTO v_numeroOspiti
+    FROM EdizioneViaggioFutura EV
+    WHERE EV.Itinerario = p_itinerario
+      AND EV.Partenza = p_partenza;
+    -- recupero della NumeroMassimoOspiti dell'Albergo
+    SELECT A.NumeroMassimoOspiti
+    INTO v_capienzaAlbergo
+    FROM Albergo A
+    WHERE A.NomeAlbergo = p_nomeAlbergo
+      AND A.Citta = p_citta;
+    -- verifica se NumeroMassimoOspiti > NumeroOspitiTotale
+    IF v_capienzaAlbergo <= v_numeroOspiti THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT =
+        'Capienza dell''albergo insufficiente';
+    END IF;
+
+    -- inserimento nuova occorrenza di AlloggioF
+    INSERT INTO AlloggioF(
+        EdizioneViaggio,
+        ItinerarioViaggio,
+        TappaNotturna,
+        ItinerarioTappa,
+        NomeAlbergo,
+        Citta
+    )
+    VALUES(
+        p_partenza,
+        p_itinerario,
+        p_numeroTappa,
+        p_itinerario,
+        p_nomeAlbergo,
+        p_citta
+    );
+
+END$$
+
+DELIMITER ;
+
+
+-- -----------------------------------------------------
 -- USERS AND PRIVILEGES
 -- -----------------------------------------------------
 
@@ -803,6 +930,7 @@ GRANT EXECUTE ON procedure `AgenziaViaggio`.`registraEdizioneViaggio` TO 'agente
 GRANT EXECUTE ON procedure `AgenziaViaggio`.`registraAlbergo` TO 'agente';
 GRANT EXECUTE ON procedure `AgenziaViaggio`.`registraAutobusAgenzia` TO 'agente';
 GRANT EXECUTE ON procedure `AgenziaViaggio`.`associaAutobusAgenzia` TO 'agente';
+GRANT EXECUTE ON procedure `AgenziaViaggio`.`associaAlbergo` TO 'agente';
 
 
 -- -----------------------------------------------------
@@ -916,21 +1044,45 @@ INSERT INTO EdizioneViaggioPassata VALUES
                                        ('2025-03-20','2025-03-30',60,9000,'GrandTourItalia');
 
 INSERT INTO TappaNotturna VALUES
-                              (1,2,'ItaliaNord','Milano'),
-                              (2,2,'ItaliaNord','Torino'),
-                              (1,1,'ItaliaSud','Napoli'),
-                              (1,1,'ArteToscana','Firenze'),
-                              (1,1,'LaghiNord','Verona'),
-                              (1,1,'CittaVenete','Venezia'),
-                              (1,1,'SiciliaTour','Palermo'),
-                              (1,1,'RomaClassica','Roma'),
-                              (1,1,'Costiera','Napoli'),
-                              (1,1,'FoodTour','Parma'),
-                              (1,1,'MareAdriatico','Bari'),
-                              (1,1,'MareTirreno','Genova'),
-                              (1,1,'Dolomiti','Verona'),
-                              (1,1,'PugliaTour','Lecce'),
-                              (1,1,'EmiliaRomagna','Bologna');
+                              (1,2,'Dolomiti','Milano'),
+                              (2,2,'Dolomiti','Parma'),
+                              (3,1,'Dolomiti','Torino'),
+                              (1,7,'RomaClassica','Milano'),
+                              (1,4,'LaghiNord','Venezia'),
+                              (2,3,'LaghiNord','Firenze'),
+
+                              (1,5,'ItaliaNord','Milano'),
+                              (2,4,'ItaliaNord','Torino'),
+                              (1,7,'ItaliaSud','Napoli'),
+                              (1,8,'ArteToscana','Firenze'),
+                              (1,7,'LaghiNord','Verona'),
+                              (1,8,'CittaVenete','Venezia'),
+                              (1,9,'SiciliaTour','Palermo'),
+                              (1,7,'RomaClassica','Roma'),
+                              (1,8,'Costiera','Napoli'),
+                              (1,7,'FoodTour','Parma'),
+                              (1,8,'MareAdriatico','Bari'),
+                              (1,9,'MareTirreno','Genova'),
+                              (1,10,'Dolomiti','Verona'),
+                              (1,8,'PugliaTour','Lecce'),
+                              (1,7,'EmiliaRomagna','Bologna'),
+                              (1,10,'GrandTourItalia','Roma'),
+
+                              (1,9,'ItaliaNord','Milano'),
+                              (1,7,'ItaliaSud','Lecce'),
+                              (1,8,'ArteToscana','Verona'),
+                              (1,7,'LaghiNord','Firenze'),
+                              (1,8,'CittaVenete','Parma'),
+                              (1,9,'SiciliaTour','Palermo'),
+                              (1,7,'RomaClassica','Roma'),
+                              (1,8,'Costiera','Palermo'),
+                              (1,7,'FoodTour','Napoli'),
+                              (1,8,'MareAdriatico','Siena'),
+                              (1,9,'MareTirreno','Lecce'),
+                              (1,10,'Dolomiti','Milano'),
+                              (1,8,'PugliaTour','Palermo'),
+                              (1,7,'EmiliaRomagna','Parma'),
+                              (1,10,'GranTourItalia','Roma');
 
 INSERT INTO Albergo VALUES
                         ('Hotel Milano','Marco',100,100,'Via Roma 1','111','111','milano@h.it','Milano'),

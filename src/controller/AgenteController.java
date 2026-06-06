@@ -158,14 +158,37 @@ public class AgenteController implements Controller {
             AssociaAutobusAgenziaOutput output = new AssociaAutobusAgenziaProceduraDAO().execute(request);
 
             //invoca funzione di stampa a schermo dell'esito positivo
-            view.visualizzaEsitoAssociazioneAlbergo(output);
+            view.visualizzaEsitoAssociazioneAutobusAgenzia(output);
 
         } catch (DAOException e) {
-            //gestione errori nella procedura di registrazione AutobusAgenzia
+            //gestione errori nella procedura di associazione AutobusAgenzia
             throw new ControllerException(e.getMessage(), e);
         }
     }
-    void  AssociaAlbergo() throws ControllerException {}
+
+
+    void  AssociaAlbergo() throws ControllerException {
+
+        //invoca AgenteView per richiede i dati in input all'agente
+        AssociaAlbergoRequest request = view.associaAlbergoRichiedi();
+
+        //verifica che la richiesta sia andata a buon fine
+        if (request == null) {return;}
+        try{
+            //esecuzione procedura di associazione Albergo
+            new AssociaAlbergoProceduraDAO().execute(request);
+
+            //invoca funzione di stampa a schermo dell'esito positivo
+            view.visualizzaEsitoAssociazioneAlbergo();
+
+        } catch (DAOException e) {
+            //gestione errori nella procedura di associazione Albergo
+            throw new ControllerException(e.getMessage(), e);
+        }
+
+    }
+
+
     void  ReportEdizioneViaggio() throws ControllerException {}
 }
 
