@@ -720,7 +720,7 @@ BEGIN
     END IF;
 
     -- implementazione regola aziendale:
-    --verifica se esiste l'EdizioneViaggioFutura ricercata
+    -- verifica se esiste l'EdizioneViaggioFutura ricercata
     IF NOT EXISTS (
         SELECT 1
         FROM EdizioneViaggioFutura
@@ -740,7 +740,7 @@ BEGIN
     IF EXISTS (
         SELECT 1
         FROM TramiteF TF
-        JOIN EdizioneViaggioF EV
+        JOIN EdizioneViaggioFutura EV
           ON TF.Partenza = EV.Partenza
          AND TF.Itinerario = EV.Itinerario
         WHERE TF.IDmezzo = p_idmezzo
@@ -879,6 +879,9 @@ INSERT INTO AutobusAgenzia (CostoMezzo, Capienza) VALUES
                                                       (6000,55);
 
 INSERT INTO EdizioneViaggioFutura VALUES
+                                      ('2026-06-20','2026-06-25',0,3800,'Dolomiti'),
+                                      ('2026-06-23','2026-06-30',275,4200,'RomaClassica'),
+                                      ('2026-06-26','2026-07-03',120,3800,'LaghiNord'),
                                       ('2026-07-01','2026-07-10',0,5000,'ItaliaNord'),
                                       ('2026-07-05','2026-07-12',0,4800,'ItaliaSud'),
                                       ('2026-07-10','2026-07-18',0,4200,'ArteToscana'),
