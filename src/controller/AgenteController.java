@@ -7,6 +7,7 @@ import exception.ApplicationException;
 import exception.ControllerException;
 import exception.DAOException;
 import model.dao.*;
+import model.domain.Report;
 import model.dto.*;
 import view.AgenteView;
 import model.enums.Ruolo;
@@ -189,6 +190,25 @@ public class AgenteController implements Controller {
     }
 
 
-    void  ReportEdizioneViaggio() throws ControllerException {}
+    void  ReportEdizioneViaggio() throws ControllerException {
+
+        //invoca AgenteView per richiedere i dati in input all'agente
+        GeneraReportRequest request = view.generaReportRichiedi();
+
+        //verifica che la richiesta sia andata a buon fine
+        if (request == null) {return;}
+        try {
+            //esecuzione procedura di generazione del report
+            Report report = new CostruisciReportProceduraDAO.execute(request);
+
+            //invoca funzione di stampa a schermo del report generato
+            view.visualizzaReport(report);
+
+        } catch (DAOException e) {
+            //gestione errori nella procedura di generazione report
+            throw new ControllerException(e.getMessage(), e);
+        }
+
+    }
 }
 

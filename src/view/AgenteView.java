@@ -378,4 +378,31 @@ public class AgenteView {
         System.out.println("*********************************");
         System.out.println("Associazione albergo completata con successo.\n");
     }
+
+
+    //FUNZIONI VIEW RELATIVE OPERAZIONE: AG7 - GeneraReport
+
+    public GeneraReportRequest generaReportRichiedi() {
+
+        //richiesta in input delle informazioni inerenti l'edizione di viaggio passata di cui generare il report
+        Scanner input = new Scanner(System.in);
+        System.out.print("\n*** OPERAZIONE DI GENERAZIONE REPORT DI EDIZIONE VIAGGIO PASSATA ***\n");
+        System.out.print("Itinerario dell'edizione: ");
+        String itinerario = input.nextLine();
+        System.out.print("Data di partenza: ");
+        String stringDataPartenza = input.nextLine();
+
+        try{
+            //conversione formato String->LocalDate
+            LocalDate dataPartenza = LocalDate.parse(stringDataPartenza);
+
+            //restituzione riferimento alla nuova istanza di record di GeneraReportRequest
+            return new GeneraReportRequest(itinerario, dataPartenza);
+
+        } catch (DateTimeParseException e) {
+            //gestione errore dovuto a formato delle date non valido
+            System.out.println("\nFormato della data non valido. Utilizzare yyyy-MM-dd.\n");
+            return null;
+        }
+    }
 }

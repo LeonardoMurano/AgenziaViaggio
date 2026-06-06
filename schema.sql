@@ -918,6 +918,76 @@ DELIMITER ;
 
 
 -- -----------------------------------------------------
+-- stored procedure `AgenziaViaggio`.`generaReport`
+-- -----------------------------------------------------
+
+DELIMITER $$
+
+CREATE PROCEDURE generaReport(
+    IN p_itinerario VARCHAR(100),
+    IN p_partenza DATE
+)
+BEGIN
+
+
+       -- CLIENTI (UTENTI + PRENOTAZIONI)
+
+    SELECT
+        u.Username,
+        u.NomeUtente,
+        u.CognomeUtente,
+        p.IDprenotazione,
+        p.NumeroOspitiPrenotazione
+    FROM Prenotazione p
+    JOIN Utente u ON u.Username = p.InfoCliente
+    WHERE p.ItinerarioP = p_itinerario
+      AND p.PartenzaP = p_partenza;
+
+
+
+       -- ALBERGHI ASSOCIATI ALLA TAPPA NOTTURNA
+
+    SELECT
+        a.NomeAlbergo,
+        a.CostoNotteOspite
+    FROM AlloggioP ap
+    JOIN Albergo a
+      ON a.NomeAlbergo = ap.NomeAlbergo
+     AND a.Citta = ap.Citta
+    WHERE ap.ItinerarioViaggio = p_itinerario
+      AND ap.EdizioneViaggio = p_partenza;
+
+
+
+       -- AUTOBUS UTILIZZATI
+
+    SELECT
+        au.IDmezzo,
+        au.CostoMezzo
+    FROM TramiteP tp
+    JOIN AutobusAgenzia au
+      ON au.IDmezzo = tp.IDmezzo
+    WHERE tp.Itinerario = p_itinerario
+      AND tp.Partenza = p_partenza;
+
+
+
+       -- DATI AGGREGATI DEL VIAGGIO
+
+    SELECT
+        ev.Rientro,
+        ev.NumeroOspitiTotale,
+        ev.CostoOperativo
+    FROM EdizioneViaggioPassata ev
+    WHERE ev.Itinerario = p_itinerario
+      AND ev.Partenza = p_partenza;
+
+END$$
+
+DELIMITER ;
+
+
+-- -----------------------------------------------------
 -- USERS AND PRIVILEGES
 -- -----------------------------------------------------
 
