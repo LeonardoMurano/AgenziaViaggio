@@ -312,6 +312,9 @@ public class AgenteView {
     public void visualizzaEsitoAssociazioneAutobusAgenzia(AutobusAssociatiEdizioneViaggio output) {
 
         //stampa a schermo l'esito dell'operazione registraAutobusAgenzia
+        System.out.println("*********************************\n");
+        System.out.println("Associazione autobus dell'agenzia completata con successo.\n");
+        //stampa a schermo dello stato attuale associazioni AutobusAgenzia-EdizioneViaggioFutura
         System.out.println(output.toString());
     }
 

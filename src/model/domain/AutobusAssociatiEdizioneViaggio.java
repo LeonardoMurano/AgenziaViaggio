@@ -31,9 +31,6 @@ public class AutobusAssociatiEdizioneViaggio {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("*********************************\n");
-        sb.append("Associazione autobus dell'agenzia completata con successo.\n");
-
         if (necessitaAltriAutobus) {
             sb.append("ATTENZIONE: è necessario associare ulteriori autobus dell'agenzia.\n");
         } else {
