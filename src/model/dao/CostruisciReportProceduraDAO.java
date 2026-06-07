@@ -5,6 +5,7 @@ import model.domain.AlbergoReport;
 import model.domain.Report;
 import model.domain.UtenteReport;
 import model.domain.AutobusReport;
+import model.dto.AssociaAlbergoRequest;
 import model.dto.GeneraReportRequest;
 
 import java.math.BigDecimal;
@@ -13,7 +14,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CostruisciReportProceduraDAO {
+public class CostruisciReportProceduraDAO implements GenericaProceduraDAO<GeneraReportRequest, Report>{
 
     public Report execute(GeneraReportRequest input) throws DAOException {
 
@@ -24,7 +25,8 @@ public class CostruisciReportProceduraDAO {
         //inizializzazione variabili locali
         LocalDate dataRientro = null;
         int numeroOspitiTotale = 0;
-        BigDecimal costoOperativo=BigDecimal.ZERO;
+        BigDecimal costoOperativo = BigDecimal.ZERO;
+        BigDecimal costoItinerario = BigDecimal.ZERO;
         //creazione liste di sostegno
         List<UtenteReport> utenteReport = new ArrayList<>();
         List<AlbergoReport> albergoReport = new ArrayList<>();
@@ -68,10 +70,12 @@ public class CostruisciReportProceduraDAO {
             while (rs2.next()) {
                 String nomeAlbergo = rs2.getString(1);
                 BigDecimal costoNotteOspite = rs2.getBigDecimal(2);
+                int durataTappa = rs2.getInt(3);
 
                 //aggiunta nuova riga in AlbergoReport
                 albergoReport.add(new AlbergoReport(nomeAlbergo,
-                        costoNotteOspite));
+                        costoNotteOspite,
+                        durataTappa));
             }
 
             //richiesta del successivo resultSet
@@ -100,6 +104,7 @@ public class CostruisciReportProceduraDAO {
                 dataRientro = rs4.getDate(1).toLocalDate();
                 numeroOspitiTotale = rs4.getInt(2);
                 costoOperativo = rs4.getBigDecimal(3);
+                costoItinerario = rs4.getBigDecimal(4);
             }
 
         } catch (SQLException e) {
@@ -112,6 +117,7 @@ public class CostruisciReportProceduraDAO {
                 dataRientro,
                 numeroOspitiTotale,
                 costoOperativo,
+                costoItinerario,
                 itinerario,
                 autobusReport,
                 albergoReport,

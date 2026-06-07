@@ -929,9 +929,18 @@ CREATE PROCEDURE generaReport(
 )
 BEGIN
 
+    -- verifica l'esistenza dell'EdizioneViaggioPassata
+    IF NOT EXISTS (
+        SELECT 1
+        FROM EdizioneViaggioPassata
+        WHERE Itinerario = p_itinerario
+          AND Partenza = p_partenza
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Edizione di viaggio inesistente';
+    END IF;
 
-       -- CLIENTI (UTENTI + PRENOTAZIONI)
-
+    -- resultSet 1: informazioni utenti e relative prenotazioni
     SELECT
         u.Username,
         u.NomeUtente,
@@ -943,24 +952,22 @@ BEGIN
     WHERE p.ItinerarioP = p_itinerario
       AND p.PartenzaP = p_partenza;
 
-
-
-       -- ALBERGHI ASSOCIATI ALLA TAPPA NOTTURNA
-
+    -- resultSet 2: informazioni alberghi
     SELECT
         a.NomeAlbergo,
-        a.CostoNotteOspite
+        a.CostoNotteOspite,
+        tn.DurataTappa
     FROM AlloggioP ap
     JOIN Albergo a
-      ON a.NomeAlbergo = ap.NomeAlbergo
-     AND a.Citta = ap.Citta
+        ON a.NomeAlbergo = ap.NomeAlbergo
+       AND a.Citta = ap.Citta
+    JOIN TappaNotturna tn
+        ON tn.Numero = ap.TappaNotturna
+       AND tn.Itinerario = ap.ItinerarioTappa
     WHERE ap.ItinerarioViaggio = p_itinerario
       AND ap.EdizioneViaggio = p_partenza;
 
-
-
-       -- AUTOBUS UTILIZZATI
-
+    -- resultSet 3: informazioni autobus
     SELECT
         au.IDmezzo,
         au.CostoMezzo
@@ -970,15 +977,15 @@ BEGIN
     WHERE tp.Itinerario = p_itinerario
       AND tp.Partenza = p_partenza;
 
-
-
-       -- DATI AGGREGATI DEL VIAGGIO
-
+    -- resultSet 4: informazioni EdizioneViaggioPassata
     SELECT
         ev.Rientro,
         ev.NumeroOspitiTotale,
-        ev.CostoOperativo
+        ev.CostoOperativo,
+        i.CostoItinerario
     FROM EdizioneViaggioPassata ev
+    JOIN Itinerario i
+        ON i.Nome = ev.Itinerario
     WHERE ev.Itinerario = p_itinerario
       AND ev.Partenza = p_partenza;
 
@@ -1008,6 +1015,7 @@ GRANT EXECUTE ON procedure `AgenziaViaggio`.`registraAlbergo` TO 'agente';
 GRANT EXECUTE ON procedure `AgenziaViaggio`.`registraAutobusAgenzia` TO 'agente';
 GRANT EXECUTE ON procedure `AgenziaViaggio`.`associaAutobusAgenzia` TO 'agente';
 GRANT EXECUTE ON procedure `AgenziaViaggio`.`associaAlbergo` TO 'agente';
+GRANT EXECUTE ON procedure `AgenziaViaggio`.`generaReport` TO 'agente';
 
 
 -- -----------------------------------------------------

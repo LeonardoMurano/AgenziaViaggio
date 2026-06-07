@@ -1,4 +1,4 @@
-package model.enums;
+package model.domain;
 
 public enum Ruolo {
     CLIENTE(1),

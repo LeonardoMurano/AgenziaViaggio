@@ -1,14 +1,15 @@
 package model.dao;
 
 import exception.DAOException;
+import model.dto.AssociaAlbergoRequest;
 import model.dto.RegistraPrenotazioneRequest;
 
 import java.sql.*;
 import java.time.LocalDate;
 
-public class RegistraPrenotazioneProceduraDAO {
+public class RegistraPrenotazioneProceduraDAO implements GenericaProceduraDAO<RegistraPrenotazioneRequest, Integer>{
 
-    public int execute(RegistraPrenotazioneRequest input) throws DAOException {
+    public Integer execute(RegistraPrenotazioneRequest input) throws DAOException {
 
         //estrazione del contenuto di RegistraPrenotazioneRequest
         int numeroOspitiprenotazione = input.numeroOspitiPrenotazione();

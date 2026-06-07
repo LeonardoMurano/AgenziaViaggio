@@ -9,11 +9,11 @@ import exception.DAOException;
 import model.dao.CancellaPrenotazioneProceduraDAO;
 import model.dao.ConnectionFactory;
 import model.dao.RegistraPrenotazioneProceduraDAO;
-import model.domain.Utente;
+import model.domain.Credenziali;
 import model.dto.CancellaPrenotazioneRequest;
 import model.dto.RegistraPrenotazioneRequest;
 import view.ClienteView;
-import model.enums.Ruolo;
+import model.domain.Ruolo;
 
 import java.sql.SQLException;
 
@@ -22,14 +22,14 @@ public class ClienteController implements Controller {
     //DICHIARAZIONE ATTRIBUTO IN CUI SONO MEMORIZZATE LE CREDENZIALI DI Cliente (Username; Password)
     //necessario perchè le operazioni su cui Cliente possiede grant
     //richiedono di tenere traccia del Cliente che le esegue
-    Utente cred;
+    Credenziali cred;
 
     //creazione istanza di ClienteView e memorizzazione del suo riferimento in 'view'
     private final ClienteView view = new ClienteView();
 
 
     //COSTRUTTORE DELLA CLASSE ClienteController
-    public ClienteController(Utente cred) {
+    public ClienteController(Credenziali cred) {
         this.cred = cred;
     }
 

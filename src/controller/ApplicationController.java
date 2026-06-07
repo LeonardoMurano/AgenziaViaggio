@@ -3,14 +3,14 @@
 package controller;
 
 import exception.ApplicationException;
-import model.domain.Utente;
+import model.domain.Credenziali;
 
 public class ApplicationController implements Controller {
 
 
-    //attributo in cui viene memorizzato il riferimento all'oggetto Utente
+    //attributo in cui viene memorizzato il riferimento all'oggetto Credenziali
     //necessario per accedere alle credenziali di login
-    Utente cred;
+    Credenziali cred;
 
 
     //FUNZIONE DI AVVIO DELL'ApplicationController

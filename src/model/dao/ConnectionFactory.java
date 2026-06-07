@@ -8,9 +8,8 @@
  */
 package model.dao;
 
-import model.enums.Ruolo;
+import model.domain.Ruolo;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;

@@ -13,4 +13,7 @@ public class AutobusReport {
         this.idMezzo = idMezzo;
         this.costoMezzo = costoMezzo;
     }
+
+    public int getIdMezzo() {return this.idMezzo;}
+    public BigDecimal getCostoMezzo() {return this.costoMezzo;}
 }

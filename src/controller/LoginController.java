@@ -6,8 +6,7 @@ import java.io.IOException;
 
 import exception.DAOException;
 import model.dao.LoginProceduraDAO;
-import model.dao.LoginProceduraDAO;
-import model.domain.Utente;
+import model.domain.Credenziali;
 import view.LoginView;
 import model.dto.LoginRequest;
 
@@ -16,7 +15,7 @@ public class LoginController implements Controller {
 
 
     //inizializzazione del riferimento ad Utente al valore null
-    Utente cred = null;
+    Credenziali cred = null;
 
     //FUNZIONE DI AVVIO DEL LoginController
     @Override
@@ -44,7 +43,7 @@ public class LoginController implements Controller {
 
     //METODO DI RICHIESTA CREDENZIALI
     //restituisce le credenziali dell'utente
-    public Utente getCred() {
+    public Credenziali getCred() {
         return cred;
     }
 }

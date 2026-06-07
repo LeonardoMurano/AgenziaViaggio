@@ -1,15 +1,16 @@
 package model.dao;
 
 import exception.DAOException;
-import model.dto.AssociaAutobusAgenziaOutput;
+import model.domain.AutobusAssociatiEdizioneViaggio;
+import model.dto.AssociaAlbergoRequest;
 import model.dto.AssociaAutobusAgenziaRequest;
 
 import java.sql.*;
 import java.time.LocalDate;
 
-public class AssociaAutobusAgenziaProceduraDAO {
+public class AssociaAutobusAgenziaProceduraDAO implements GenericaProceduraDAO<AssociaAutobusAgenziaRequest, AutobusAssociatiEdizioneViaggio>{
 
-    public AssociaAutobusAgenziaOutput execute(AssociaAutobusAgenziaRequest input) throws DAOException {
+    public AutobusAssociatiEdizioneViaggio execute(AssociaAutobusAgenziaRequest input) throws DAOException {
 
         //estrazione del contenuto di AssociaAutobusAgenziaRequest
         int idMezzo = input.idMezzo();
@@ -42,6 +43,6 @@ public class AssociaAutobusAgenziaProceduraDAO {
         }
 
         //restituisce al chiamante l'output della stored procedure
-        return new AssociaAutobusAgenziaOutput(capienzaTotale, numeroOspitiTotale);
+        return new AutobusAssociatiEdizioneViaggio(capienzaTotale, numeroOspitiTotale);
     }
 }

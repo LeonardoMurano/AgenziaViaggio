@@ -7,10 +7,11 @@ import exception.ApplicationException;
 import exception.ControllerException;
 import exception.DAOException;
 import model.dao.*;
+import model.domain.AutobusAssociatiEdizioneViaggio;
 import model.domain.Report;
 import model.dto.*;
 import view.AgenteView;
-import model.enums.Ruolo;
+import model.domain.Ruolo;
 
 import java.sql.SQLException;
 
@@ -156,7 +157,7 @@ public class AgenteController implements Controller {
         if (request == null) {return;}
         try{
             //esecuzione procedura di associazione AutobusAgenzia
-            AssociaAutobusAgenziaOutput output = new AssociaAutobusAgenziaProceduraDAO().execute(request);
+            AutobusAssociatiEdizioneViaggio output = new AssociaAutobusAgenziaProceduraDAO().execute(request);
 
             //invoca funzione di stampa a schermo dell'esito positivo
             view.visualizzaEsitoAssociazioneAutobusAgenzia(output);
@@ -199,7 +200,7 @@ public class AgenteController implements Controller {
         if (request == null) {return;}
         try {
             //esecuzione procedura di generazione del report
-            Report report = new CostruisciReportProceduraDAO.execute(request);
+            Report report = new CostruisciReportProceduraDAO().execute(request);
 
             //invoca funzione di stampa a schermo del report generato
             view.visualizzaReport(report);

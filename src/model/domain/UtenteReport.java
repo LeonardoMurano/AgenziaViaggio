@@ -21,4 +21,10 @@ public class UtenteReport {
         this.idPrenotazione = idPrenotazione;
         this.numeroOspitiPrenotazione = numeroOspitePrenotazione;
     }
+
+    public String getUsername() {return username;}
+    public String getNomeUtente() {return nomeUtente;}
+    public String getCognomeUtente() {return cognomeUtente;}
+    public int getIdPrenotazione() {return idPrenotazione;}
+    public int getNumeroOspitiPrenotazione() {return this.numeroOspitiPrenotazione;}
 }

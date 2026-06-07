@@ -5,19 +5,19 @@
 package model.dao;
 
 import exception.DAOException;
-import model.domain.Utente;
+import model.domain.Credenziali;
 import model.dto.LoginRequest;
-import model.enums.Ruolo;
+import model.domain.Ruolo;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Types;
 
-public class LoginProceduraDAO implements GenericaProceduraDAO<LoginRequest, Utente> {
+public class LoginProceduraDAO implements GenericaProceduraDAO<LoginRequest, Credenziali> {
 
     @Override
-    public Utente execute(LoginRequest input) throws DAOException {
+    public Credenziali execute(LoginRequest input) throws DAOException {
 
         //estrazione del contenuto di LoginRequest
         String username = input.username();
@@ -47,6 +47,6 @@ public class LoginProceduraDAO implements GenericaProceduraDAO<LoginRequest, Ute
         }
 
         //ritorna al chiamante l'Utente autenticato
-        return new Utente(username, password, Ruolo.fromInt(ruolo));
+        return new Credenziali(username, password, Ruolo.fromInt(ruolo));
     }
 }

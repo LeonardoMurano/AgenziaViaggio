@@ -3,6 +3,8 @@
  */
 package view;
 
+import model.domain.AutobusAssociatiEdizioneViaggio;
+import model.domain.Report;
 import model.dto.*;
 
 import java.math.BigDecimal;
@@ -307,29 +309,10 @@ public class AgenteView {
     }
 
 
-    public void visualizzaEsitoAssociazioneAutobusAgenzia(AssociaAutobusAgenziaOutput output) {
+    public void visualizzaEsitoAssociazioneAutobusAgenzia(AutobusAssociatiEdizioneViaggio output) {
 
-        //estrazione del contenuto di AssociaAutobusAgenziaOutput
-        int capienzaTotale = output.capienzaTotale();
-        int capienzaRichiesta = output.numeroOspitiTotale();
-
-        //stampa a schermo l'esito positivo dell'operazione registraAutobusAgenzia
-        System.out.println("*********************************");
-        System.out.println("Associazione autobus dell'agenzia completata con successo.");
-
-        //calcolo numero ospiti mancanti
-        int capienzaResidua = capienzaRichiesta - capienzaTotale;
-
-        if (capienzaResidua > 0) {
-            System.out.println("ATTENZIONE: è necessario associare ulteriori autobus dell'agenzia.");
-            System.out.println("Capienza totale autobus associati: " + capienzaTotale);
-            System.out.println("Capienza totale richiesta autobus associati: " + capienzaRichiesta);
-            System.out.println("Capienza richiesta residua: " + capienzaResidua + "\n");
-        } else {
-            System.out.println("Non è necessario associare ulteriori autobus dell'agenzia.");
-            System.out.println("Capienza totale autobus associati: " + capienzaTotale);
-            System.out.println("Capienza totale richiesta autobus associati: " + capienzaRichiesta + "\n");
-        }
+        //stampa a schermo l'esito dell'operazione registraAutobusAgenzia
+        System.out.println(output.toString());
     }
 
 
@@ -404,5 +387,12 @@ public class AgenteView {
             System.out.println("\nFormato della data non valido. Utilizzare yyyy-MM-dd.\n");
             return null;
         }
+    }
+
+
+    public void visualizzaReport(Report report) {
+
+        //stampa del Report costruito
+        System.out.println(report.toString());
     }
 }

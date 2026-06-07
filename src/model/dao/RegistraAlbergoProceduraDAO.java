@@ -1,6 +1,7 @@
 package model.dao;
 
 import exception.DAOException;
+import model.dto.AssociaAlbergoRequest;
 import model.dto.RegistraAlbergoRequest;
 
 import java.math.BigDecimal;
@@ -8,9 +9,9 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class RegistraAlbergoProceduraDAO {
+public class RegistraAlbergoProceduraDAO implements GenericaProceduraDAO<RegistraAlbergoRequest, Void>{
 
-    public void execute(RegistraAlbergoRequest input) throws DAOException {
+    public Void execute(RegistraAlbergoRequest input) throws DAOException {
 
         //estrazione del contenuto di RegistraAlbergoRequest
         String nomeAlbergo = input.nomeAlbergo();
@@ -46,5 +47,7 @@ public class RegistraAlbergoProceduraDAO {
             //gestione eccezione dovuta a input errato
             throw new DAOException("Errore nella registrazione albergo: " + e.getMessage());
         }
+
+        return null;
     }
 }

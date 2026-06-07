@@ -1,15 +1,16 @@
 package model.dao;
 
 import exception.DAOException;
+import model.dto.AssociaAlbergoRequest;
 import model.dto.CancellaPrenotazioneRequest;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class CancellaPrenotazioneProceduraDAO {
+public class CancellaPrenotazioneProceduraDAO implements GenericaProceduraDAO<CancellaPrenotazioneRequest, Void>{
 
-    public void execute(CancellaPrenotazioneRequest input) throws DAOException {
+    public Void execute(CancellaPrenotazioneRequest input) throws DAOException {
 
         //estrazione del contenuto di CancellaPrenotazioneRequest
         int idPrenotazione = input.idPrenotazione();
@@ -32,5 +33,7 @@ public class CancellaPrenotazioneProceduraDAO {
             //gestione eccezione dovuta a input errato
             throw new DAOException("Errore nella cancellazione prenotazione: " + e.getMessage());
         }
+
+        return null;
     }
 }

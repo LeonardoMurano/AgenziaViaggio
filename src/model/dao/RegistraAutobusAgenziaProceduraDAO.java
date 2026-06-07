@@ -1,6 +1,7 @@
 package model.dao;
 
 import exception.DAOException;
+import model.dto.AssociaAlbergoRequest;
 import model.dto.RegistraAutobusAgenziaRequest;
 
 import java.math.BigDecimal;
@@ -9,9 +10,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Types;
 
-public class RegistraAutobusAgenziaProceduraDAO {
+public class RegistraAutobusAgenziaProceduraDAO implements GenericaProceduraDAO<RegistraAutobusAgenziaRequest, Integer>{
 
-    public int execute(RegistraAutobusAgenziaRequest input) throws DAOException{
+    public Integer execute(RegistraAutobusAgenziaRequest input) throws DAOException{
 
         //estrazione del contenuto di RegistraAutobusAgenziaRequest
         BigDecimal costoMezzo = input.costoMezzo();

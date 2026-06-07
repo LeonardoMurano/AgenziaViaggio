@@ -3,7 +3,7 @@
  */
 package view;
 
-import model.domain.Utente;
+import model.domain.Credenziali;
 import model.dto.CancellaPrenotazioneRequest;
 import model.dto.RegistraPrenotazioneRequest;
 
@@ -67,7 +67,7 @@ public class ClienteView {
 
     //FUNZIONI VIEW RELATIVE OPERAZIONE: CL1 - RegistraPrenotazione
 
-    public RegistraPrenotazioneRequest richiediRegistraPrenotazione(Utente cred){
+    public RegistraPrenotazioneRequest richiediRegistraPrenotazione(Credenziali cred){
 
         //richiesta in input delle informazioni inerenti la prenotazione da registrare
         Scanner input = new Scanner(System.in);
@@ -116,7 +116,7 @@ public class ClienteView {
 
     //FUNZIONI VIEW RELATIVE OPERAZIONE: CL2 - CancellaPrenotazione
 
-    public CancellaPrenotazioneRequest richiediCancellaPrenotazione(Utente cred){
+    public CancellaPrenotazioneRequest richiediCancellaPrenotazione(Credenziali cred){
 
         //richiesta in input delle informazioni inerenti la prenotazione da registrare
         Scanner input = new Scanner(System.in);

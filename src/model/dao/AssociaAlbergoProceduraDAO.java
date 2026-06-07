@@ -1,7 +1,9 @@
 package model.dao;
 
 import exception.DAOException;
+import model.domain.Credenziali;
 import model.dto.AssociaAlbergoRequest;
+import model.dto.LoginRequest;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -9,9 +11,9 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
-public class AssociaAlbergoProceduraDAO {
+public class AssociaAlbergoProceduraDAO implements GenericaProceduraDAO<AssociaAlbergoRequest, Void> {
 
-    public void execute(AssociaAlbergoRequest input) throws DAOException {
+    public Void execute(AssociaAlbergoRequest input) throws DAOException {
 
         //estrazione del contenuto di AssociaAlbergoRequest
         String itinerario = input.itinerario();
@@ -37,5 +39,7 @@ public class AssociaAlbergoProceduraDAO {
             //gestione eccezione dovuta a input errato
             throw new DAOException("Errore nell'associazione dell'albergo: " + e.getMessage());
         }
+
+        return null;
     }
 }
