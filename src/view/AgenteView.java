@@ -93,13 +93,6 @@ public class AgenteView {
             //conversione formato String->int
             int counterTappe = Integer.parseInt(stringCounterTappe);
 
-            //verifica validità argomento numeroTappe
-            if (counterTappe < 1) {
-                //gestione errore dovuto ad argomento numeroTappe non valido
-                System.out.println("\nArgomento del numero di tappe non valido. Inserire un valore >=1.\n");
-                return null;
-            }
-
             //inizializzazione liste in cui memorizzare informazioni inerenti le tappe
             List<Integer> durataTappa = new ArrayList<>();
             List<Integer> numeroTappa = new ArrayList<>();

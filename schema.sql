@@ -104,7 +104,8 @@ CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`Prenotazione` (
     FOREIGN KEY (`PartenzaF` , `ItinerarioF`)
     REFERENCES `AgenziaViaggio`.`EdizioneViaggioFutura` (`Partenza` , `Itinerario`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON UPDATE NO ACTION,
+    CHECK (`NumeroOspitiPrenotazione` > 0))
     ENGINE = InnoDB;
 
 CREATE INDEX `fk_Prenotazione_Cliente_idx` ON `AgenziaViaggio`.`Prenotazione` (`InfoCliente` ASC) VISIBLE;
@@ -121,7 +122,8 @@ CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`AutobusAgenzia` (
                                                                  `IDmezzo` INT UNSIGNED NOT NULL AUTO_INCREMENT,
                                                                  `CostoMezzo` DECIMAL(10,2) UNSIGNED NOT NULL,
     `Capienza` INT UNSIGNED NOT NULL,
-    PRIMARY KEY (`IDmezzo`))
+    PRIMARY KEY (`IDmezzo`),
+    CHECK (`Capienza` > 0))
     ENGINE = InnoDB;
 
 
@@ -152,7 +154,8 @@ CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`TappaNotturna` (
     FOREIGN KEY (`Citta`)
     REFERENCES `AgenziaViaggio`.`Citta` (`NomeCitta`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON UPDATE NO ACTION,
+    CHECK (`DurataTappa` > 0))
     ENGINE = InnoDB;
 
 CREATE INDEX `fk_TappaNotturna_Itinerario1_idx` ON `AgenziaViaggio`.`TappaNotturna` (`Itinerario` ASC) VISIBLE;
@@ -166,8 +169,8 @@ CREATE INDEX `fk_TappaNotturna_Citta1_idx` ON `AgenziaViaggio`.`TappaNotturna` (
 CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`Albergo` (
                                                           `NomeAlbergo` VARCHAR(100) NOT NULL,
     `Referente` VARCHAR(100) NOT NULL,
-    `CostoNotteOspite` DECIMAL(10,2) NOT NULL,
-    `NumeroMassimoOspiti` INT NOT NULL,
+    `CostoNotteOspite` DECIMAL(10,2) UNSIGNED NOT NULL,
+    `NumeroMassimoOspiti` INT UNSIGNED NOT NULL,
     `Indirizzo` VARCHAR(255) NOT NULL,
     `Telefono` VARCHAR(20) NOT NULL,
     `Fax` VARCHAR(20) NOT NULL,
@@ -178,7 +181,9 @@ CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`Albergo` (
     FOREIGN KEY (`Citta`)
     REFERENCES `AgenziaViaggio`.`Citta` (`NomeCitta`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON UPDATE NO ACTION,
+    CHECK (`NumeroMassimoOspiti` > 0),
+    CHECK (Email LIKE '%@%'))
     ENGINE = InnoDB;
 
 CREATE INDEX `fk_Albergo_Citta1_idx` ON `AgenziaViaggio`.`Albergo` (`Citta` ASC) VISIBLE;
@@ -364,22 +369,6 @@ CREATE PROCEDURE registraPrenotazione(
     OUT p_idPrenotazione INT
 )
 BEGIN
-
-    -- verifica che il numero di ospiti sia >=0
-    IF p_numeroOspiti <= 0 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Numero ospiti non valido';
-END IF;
-
-    -- implementazione regola aziendale:
-    -- verifica che la prenotazione sia inerente un viaggio con partenza prevista tra >=20 giorni
-    IF DATEDIFF(p_partenzaF, CURRENT_DATE()) < 20 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT =
-            'Prenotazione non consentita: meno di 20 giorni alla partenza';
-END IF;
-
-
     -- inserisce in Prenotazione la tupla definita dai valori in input:
     -- una nuova prenotazione deve sempre riferirsi ad una EdizioneViaggioFutura dunque si forzano PartenzaP, ItinerarioP a NULL
     -- idPrenotazione è autogenerato: viene omesso nell'INSERT
@@ -448,14 +437,6 @@ END IF;
     IF v_cliente <> p_username THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'La prenotazione non appartiene al cliente';
-END IF;
-
-    -- implementazione regola aziendale:
-    -- verifica che la prenotazione sia inerente un viaggio con partenza prevista tra >=20 giorni
-    IF DATEDIFF(v_partenza, CURRENT_DATE()) < 20 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT =
-            'Cancellazione non consentita: meno di 20 giorni alla partenza';
 END IF;
 
     -- cancellazione della prenotazione identificata da p_idPrenotazione
@@ -571,6 +552,7 @@ BEGIN
     -- verifica che la data della partenza sia tra >=20 giorni:
     -- vincolo che è diretta conseguenza della regola aziendale secondo la quale
     -- è possibile effettuare prenotazioni quando mancano >=20 giorni alla partenza
+    -- non implementato con trigger per motivi di efficienza del sistema
     IF DATEDIFF(p_dataPartenza, CURRENT_DATE()) < 20 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'La data di partenza deve essere almeno 20 giorni successiva alla data odierna';
@@ -719,40 +701,6 @@ END IF;
         SET MESSAGE_TEXT = 'Associazione non consentita: più di 20 giorni alla partenza';
 END IF;
 
-    -- implementazione regola aziendale:
-    -- verifica se esiste l'EdizioneViaggioFutura ricercata
-    IF NOT EXISTS (
-        SELECT 1
-        FROM EdizioneViaggioFutura
-        WHERE Partenza = p_partenza
-          AND Itinerario = p_itinerario
-    ) THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'EdizioneViaggioFutura non trovata';
-END IF;
-    -- recupera la data di Rientro da EdizioneViaggioFutura
-SELECT Rientro
-INTO v_rientro
-FROM EdizioneViaggioFutura
-WHERE Partenza = p_partenza
-  AND Itinerario = p_itinerario;
--- verifica se AutobusAgenzia è associato ad almeno un'altra EdizioneViaggioFutura sovrapposta a quella attuale
-IF EXISTS (
-        SELECT 1
-        FROM TramiteF TF
-        JOIN EdizioneViaggioFutura EV
-          ON TF.Partenza = EV.Partenza
-         AND TF.Itinerario = EV.Itinerario
-        WHERE TF.IDmezzo = p_idmezzo
-          AND NOT (
-              EV.Rientro < p_partenza
-              OR EV.Partenza > v_rientro
-          )
-    ) THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Autobus già assegnato a un viaggio sovrapposto';
-END IF;
-
     -- inserimento nuova occorrenza di TramiteF
 INSERT INTO TramiteF (Partenza, Itinerario, IDmezzo)
 VALUES (p_partenza, p_itinerario, p_idmezzo);
@@ -799,12 +747,6 @@ CREATE PROCEDURE associaAlbergo(
 BEGIN
 
     -- dichiarazione variabili locali
-    DECLARE v_cittaTappa VARCHAR(100);
-    DECLARE v_cittaAlbergo VARCHAR(100);
-
-    DECLARE v_numeroOspiti INT;
-    DECLARE v_capienzaAlbergo INT;
-
     DECLARE v_count INT;
 
     -- verifica esistenza edizione futura
@@ -823,75 +765,15 @@ END IF;
 
     -- implementazione regola aziendale:
     -- verifica che che l'associazione sia inerente un'EdizioneViaggioFutura con partenza prevista tra 0 e 20 giorni
+    IF DATEDIFF(p_partenza, CURDATE()) < 0 THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT =
+    'Data di partenza già trascorsa';
+END IF;
+
    IF DATEDIFF(p_partenza, CURDATE()) > 20 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Associazione non consentita: più di 20 giorni alla partenza';
-END IF;
-
-    -- implementazione regola aziendale:
-    -- verifica se la tappa per la quale si effettua l'associazione appartiene all'itinerario di EdizioneViaggioFutura
-SELECT COUNT(*)
-INTO v_count
-FROM TappaNotturna TN
-WHERE TN.Numero = p_numeroTappa
-  AND TN.Itinerario = p_itinerario;
-
-IF v_count = 0 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT =
-        'La tappa non appartiene all''itinerario dell''edizione';
-END IF;
-
-
-    -- implementazione regola aziendale:
-    -- recupero della città della TappaNotturna
-SELECT TN.Citta
-INTO v_cittaTappa
-FROM TappaNotturna TN
-WHERE TN.Numero = p_numeroTappa
-  AND TN.Itinerario = p_itinerario;
--- verifica l'esistenza dell'Albergo
-SELECT COUNT(*)
-INTO v_count
-FROM Albergo A
-WHERE A.NomeAlbergo = p_nomeAlbergo
-  AND A.Citta = p_citta;
-
-IF v_count = 0 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Albergo inesistente';
-END IF;
-    -- recupero della città dell'Albergo
-SELECT A.Citta
-INTO v_cittaAlbergo
-FROM Albergo A
-WHERE A.NomeAlbergo = p_nomeAlbergo
-  AND A.Citta = p_citta;
--- verifica se la città in cui si svolge TappaNotturna è uguale a quella dell'Albergo
-IF v_cittaTappa <> v_cittaAlbergo THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT =
-        'L''albergo deve appartenere alla stessa città della tappa';
-END IF;
-
-    -- implementazione regola aziendale:
-    -- recupero del NumeroOspitiTotale dell'EdizioneViaggioFutura
-SELECT EV.NumeroOspitiTotale
-INTO v_numeroOspiti
-FROM EdizioneViaggioFutura EV
-WHERE EV.Itinerario = p_itinerario
-  AND EV.Partenza = p_partenza;
--- recupero del NumeroMassimoOspiti dell'Albergo
-SELECT A.NumeroMassimoOspiti
-INTO v_capienzaAlbergo
-FROM Albergo A
-WHERE A.NomeAlbergo = p_nomeAlbergo
-  AND A.Citta = p_citta;
--- verifica se NumeroMassimoOspiti > NumeroOspitiTotale
-IF v_capienzaAlbergo <= v_numeroOspiti THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT =
-        'Capienza dell''albergo insufficiente';
 END IF;
 
     -- inserimento nuova occorrenza di AlloggioF
@@ -995,6 +877,401 @@ DELIMITER ;
 
 
 -- -----------------------------------------------------
+-- TRIGGERS
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Triggers attivati da `AgenziaViaggio`.`registraPrenotazione`
+-- -----------------------------------------------------
+DELIMITER $$
+
+CREATE TRIGGER trg_check_prenotazione_data
+    BEFORE INSERT ON Prenotazione
+    FOR EACH ROW
+BEGIN
+    -- implementazione regola aziendale:
+    -- verifica che l'inserimento della prenotazione sia inerente un viaggio con partenza prevista tra >=20 giorni
+    IF DATEDIFF(NEW.PartenzaF, CURRENT_DATE()) < 20 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT =
+        'Prenotazione non consentita: meno di 20 giorni alla partenza';
+END IF;
+
+END $$
+
+DELIMITER $$
+
+CREATE TRIGGER trg_update_ospiti_after_insert
+    AFTER INSERT ON Prenotazione
+    FOR EACH ROW
+BEGIN
+
+    -- aggiorna il totale ospiti dell'edizione futura associata alla nuova prenotazione registrata
+    UPDATE EdizioneViaggioFutura
+    SET NumeroOspitiTotale =
+            (
+                SELECT COALESCE(SUM(NumeroOspitiPrenotazione), 0)
+                FROM Prenotazione
+                WHERE PartenzaF = NEW.PartenzaF
+                  AND ItinerarioF = NEW.ItinerarioF
+            )
+    WHERE Partenza = NEW.PartenzaF
+      AND Itinerario = NEW.ItinerarioF;
+
+    END$$
+
+    DELIMITER ;
+
+
+-- -----------------------------------------------------
+-- Triggers attivati da `AgenziaViaggio`.`cancellaPrenotazione`
+-- -----------------------------------------------------
+
+DELIMITER $$
+
+    CREATE TRIGGER trg_check_delete_prenotazione
+        BEFORE DELETE ON Prenotazione
+        FOR EACH ROW
+    BEGIN
+
+        DECLARE v_partenza DATE;
+
+    -- sceglie se usare PartenzaF o PartenzaP nel controllo in base a quale delle due è NULL
+    IF OLD.PartenzaF IS NOT NULL THEN
+        SET v_partenza = OLD.PartenzaF;
+        ELSE
+        SET v_partenza = OLD.PartenzaP;
+    END IF;
+
+    -- verifica della validità dell'occorrenza di Prenotazione
+    IF v_partenza IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Prenotazione senza data valida';
+END IF;
+
+-- implementazione regola aziendale:
+-- verifica che la cancellazione della prenotazione sia inerente un viaggio con partenza prevista tra >=20 giorni
+IF DATEDIFF(v_partenza, CURRENT_DATE()) < 20 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT =
+        'Cancellazione non consentita: meno di 20 giorni alla partenza';
+END IF;
+
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_update_ospiti_after_delete
+    AFTER DELETE ON Prenotazione
+    FOR EACH ROW
+BEGIN
+
+    -- aggiorna il totale ospiti dell'edizione futura associata alla prenotazione cancellata
+    UPDATE EdizioneViaggioFutura
+    SET NumeroOspitiTotale =
+            (
+                SELECT COALESCE(SUM(NumeroOspitiPrenotazione), 0)
+                FROM Prenotazione
+                WHERE PartenzaF = OLD.PartenzaF
+                  AND ItinerarioF = OLD.ItinerarioF
+            )
+    WHERE Partenza = OLD.PartenzaF
+      AND Itinerario = OLD.ItinerarioF;
+
+    END$$
+
+    DELIMITER ;
+
+-- -----------------------------------------------------
+-- Triggers attivati da `AgenziaViaggio`.`associaAutobusAgenzia`
+-- -----------------------------------------------------
+
+DELIMITER $$
+
+    CREATE TRIGGER trg_check_autobus_sovrapposizione
+        BEFORE INSERT ON TramiteF
+        FOR EACH ROW
+    BEGIN
+
+        DECLARE v_rientro DATE;
+
+    -- recupero rientro dell’edizione su cui si sta inserendo l’autobus
+        SELECT EV.Rientro
+        INTO v_rientro
+        FROM EdizioneViaggioFutura EV
+        WHERE EV.Partenza = NEW.Partenza
+          AND EV.Itinerario = NEW.Itinerario;
+
+        -- verifica esistenza edizione
+        IF v_rientro IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'EdizioneViaggioFutura non valida';
+    END IF;
+
+    -- controllo sovrapposizione autobus
+    IF EXISTS (
+        SELECT 1
+        FROM TramiteF TF
+        JOIN EdizioneViaggioFutura EV
+          ON TF.Partenza = EV.Partenza
+         AND TF.Itinerario = EV.Itinerario
+        WHERE TF.IDmezzo = NEW.IDmezzo
+          AND NOT (
+              EV.Rientro < NEW.Partenza
+              OR EV.Partenza > v_rientro
+          )
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Autobus già assegnato a un viaggio sovrapposto';
+END IF;
+
+END$$
+
+DELIMITER ;
+
+
+-- -----------------------------------------------------
+-- Triggers attivati da `AgenziaViaggio`.`associaAlbergo`
+-- -----------------------------------------------------
+
+DELIMITER $$
+
+CREATE TRIGGER trg_check_albergo_citta
+    BEFORE INSERT ON AlloggioF
+    FOR EACH ROW
+BEGIN
+
+    DECLARE v_cittaTappa VARCHAR(100);
+    DECLARE v_cittaAlbergo VARCHAR(100);
+
+    -- città della tappa
+    SELECT Citta
+    INTO v_cittaTappa
+    FROM TappaNotturna
+    WHERE Numero = NEW.TappaNotturna
+      AND Itinerario = NEW.ItinerarioTappa;
+
+    -- città albergo
+    SELECT Citta
+    INTO v_cittaAlbergo
+    FROM Albergo
+    WHERE NomeAlbergo = NEW.NomeAlbergo;
+
+    -- controllo coerenza
+    IF v_cittaTappa IS NULL OR v_cittaAlbergo IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Albergo o tappa non valido';
+END IF;
+
+IF v_cittaTappa <> v_cittaAlbergo THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Albergo non coerente con la città della tappa';
+END IF;
+
+END$$
+
+DELIMITER $$
+
+CREATE TRIGGER trg_check_capienza_albergo
+    BEFORE INSERT ON AlloggioF
+    FOR EACH ROW
+BEGIN
+
+    DECLARE v_numeroOspiti INT;
+    DECLARE v_capienza INT;
+
+    -- recupero numero ospiti dell’edizione
+    SELECT NumeroOspitiTotale
+    INTO v_numeroOspiti
+    FROM EdizioneViaggioFutura
+    WHERE Partenza = NEW.EdizioneViaggio
+      AND Itinerario = NEW.ItinerarioViaggio;
+
+    -- recupero capienza albergo
+    SELECT NumeroMassimoOspiti
+    INTO v_capienza
+    FROM Albergo
+    WHERE NomeAlbergo = NEW.NomeAlbergo
+      AND Citta = NEW.Citta;
+
+    -- verifica se NumeroMassimoOspiti > NumeroOspitiTotale
+    IF v_capienza <= v_numeroOspiti THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Capienza albergo insufficiente rispetto agli ospiti dell’edizione';
+END IF;
+
+END$$
+
+DELIMITER;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_check_tappa_alloggio
+    BEFORE INSERT ON AlloggioF
+    FOR EACH ROW
+BEGIN
+
+    DECLARE v_count INT;
+	-- verifica se la tappa notturna appartiene all'Itinerario dell'EdizioneViaggioFutura
+    SELECT COUNT(*)
+    INTO v_count
+    FROM TappaNotturna
+    WHERE Numero = NEW.TappaNotturna
+      AND Itinerario = NEW.ItinerarioTappa;
+
+    IF v_count = 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'La tappa non appartiene all’itinerario';
+END IF;
+
+END$$
+
+DELIMITER ;
+
+
+-- -----------------------------------------------------
+-- EVENTS
+-- -----------------------------------------------------
+
+-- attivazione dello scheduler degli eventi
+SET GLOBAL event_scheduler = ON;
+
+-- -----------------------------------------------------
+-- event `AgenziaViaggio`.`spostaEdizioniPassate`
+-- -----------------------------------------------------
+
+DELIMITER $$
+
+CREATE EVENT spostaEdizioniPassate
+ON SCHEDULE EVERY 1 DAY
+STARTS CURRENT_TIMESTAMP
+DO
+BEGIN
+
+    -- handler che implementa rollback e pulizia temporary table nel caso in cui la transazione non va a buon fine
+     DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+ROLLBACK;
+DROP TEMPORARY TABLE IF EXISTS tmp_edizioni;
+END;
+
+	-- inizio transazione
+START TRANSACTION;
+
+-- creazione temporary table in cui memorizzare le EdizioneViaggioFutura tali che Rientro < CURDATE()
+-- necessario per garantire che tutte le operazioni lavorino sullo stesso insieme di tuple
+CREATE TEMPORARY TABLE tmp_edizioni AS
+SELECT
+    Partenza,
+    Itinerario
+FROM EdizioneViaggioFutura
+WHERE Rientro < CURDATE();
+
+
+-- copia delle EdizioneViaggioFutura, presenti in tmp_edizioni, in EdizioneViaggioPassata
+INSERT INTO EdizioneViaggioPassata
+(
+    Partenza,
+    Rientro,
+    NumeroOspitiTotale,
+    CostoOperativo,
+    Itinerario
+)
+SELECT
+    ev.Partenza,
+    ev.Rientro,
+    ev.NumeroOspitiTotale,
+    ev.CostoOperativo,
+    ev.Itinerario
+FROM EdizioneViaggioFutura ev
+         JOIN tmp_edizioni t
+              ON ev.Partenza = t.Partenza
+                  AND ev.Itinerario = t.Itinerario;
+
+-- aggiornamento istanze di Prenotazioni con FK inerenti EdizioneViaggioFutura presenti in tmp_edizioni
+UPDATE Prenotazione p
+    JOIN tmp_edizioni t
+ON p.PartenzaF = t.Partenza
+    AND p.ItinerarioF = t.Itinerario
+    SET
+        p.PartenzaP = p.PartenzaF,
+        p.ItinerarioP = p.ItinerarioF,
+        p.PartenzaF = NULL,
+        p.ItinerarioF = NULL;
+
+-- copia delle occorrenze di TramiteF, con FK inerenti EdizioneViaggioFutura presenti in tmp_edizioni, in TramiteP
+INSERT INTO TramiteP
+(
+    Partenza,
+    Itinerario,
+    IDmezzo
+)
+SELECT
+    tf.Partenza,
+    tf.Itinerario,
+    tf.IDmezzo
+FROM TramiteF tf
+         JOIN tmp_edizioni t
+              ON tf.Partenza = t.Partenza
+                  AND tf.Itinerario = t.Itinerario;
+
+-- copia delle occorrenze di AlloggioF, con FK inerenti EdizioneViaggioFutura presenti in tmp_edizioni, in AlloggioP
+INSERT INTO AlloggioP
+(
+    EdizioneViaggio,
+    ItinerarioViaggio,
+    TappaNotturna,
+    ItinerarioTappa,
+    NomeAlbergo,
+    Citta
+)
+SELECT
+    af.EdizioneViaggio,
+    af.ItinerarioViaggio,
+    af.TappaNotturna,
+    af.ItinerarioTappa,
+    af.NomeAlbergo,
+    af.Citta
+FROM AlloggioF af
+         JOIN tmp_edizioni t
+              ON af.EdizioneViaggio = t.Partenza
+                  AND af.ItinerarioViaggio = t.Itinerario;
+
+-- cancellazione delle occorrenze di TramiteF copiate in TramiteP
+DELETE tf
+    FROM TramiteF tf
+    JOIN tmp_edizioni t
+      ON tf.Partenza = t.Partenza
+     AND tf.Itinerario = t.Itinerario;
+
+	-- cancellazione delle occorrenze di AlloggioF copiate in AlloggioP
+    DELETE af
+    FROM AlloggioF af
+    JOIN tmp_edizioni t
+      ON af.EdizioneViaggio = t.Partenza
+     AND af.ItinerarioViaggio = t.Itinerario;
+
+	-- cancellazione delle occorrenze di EdizioneViaggioFutura copiate in EdizioneViaggioPassata
+    DELETE ev
+    FROM EdizioneViaggioFutura ev
+    JOIN tmp_edizioni t
+      ON ev.Partenza = t.Partenza
+     AND ev.Itinerario = t.Itinerario;
+
+	-- pulizia e deallocazione temporary table
+    DROP TEMPORARY TABLE IF EXISTS tmp_edizioni;
+
+	-- commit della transazione
+COMMIT;
+
+END$$
+
+DELIMITER ;
+
+
+-- -----------------------------------------------------
 -- USERS AND PRIVILEGES
 -- -----------------------------------------------------
 
@@ -1072,7 +1349,9 @@ INSERT INTO Itinerario VALUES
                            ('Dolomiti', 1400),
                            ('PugliaTour', 1200),
                            ('EmiliaRomagna', 750),
-                           ('GrandTourItalia', 2000);
+                           ('GrandTourItalia', 2000),
+
+                           ('TestScaduto', 1200);
 
 INSERT INTO AutobusAgenzia (CostoMezzo, Capienza) VALUES
                                                       (5000,50),
@@ -1109,7 +1388,9 @@ INSERT INTO EdizioneViaggioFutura VALUES
                                       ('2026-09-05','2026-09-15',0,7000,'Dolomiti'),
                                       ('2026-09-10','2026-09-18',0,5500,'PugliaTour'),
                                       ('2026-09-15','2026-09-22',0,4000,'EmiliaRomagna'),
-                                      ('2026-09-20','2026-09-30',0,9000,'GrandTourItalia');
+                                      ('2026-09-20','2026-09-30',0,9000,'GrandTourItalia'),
+
+                                      ('2026-05-01','2026-05-05',30,2000,'TestScaduto');
 
 INSERT INTO EdizioneViaggioPassata VALUES
                                        ('2025-03-05','2025-03-15',55,7000,'Dolomiti'),
@@ -1149,7 +1430,9 @@ INSERT INTO TappaNotturna VALUES
                               (1,9,'MareTirreno','Genova'),
                               (1,8,'PugliaTour','Lecce'),
                               (1,7,'EmiliaRomagna','Bologna'),
-                              (1,10,'GrandTourItalia','Roma');
+                              (1,10,'GrandTourItalia','Roma'),
+
+                              (1, 2, 'TestScaduto', 'Roma');
 
 INSERT INTO Albergo VALUES
                         ('Hotel Milano','Marco',100,100,'Via Roma 1','111','111','milano@h.it','Milano'),
@@ -1173,21 +1456,24 @@ INSERT INTO Albergo VALUES
 INSERT INTO Prenotazione (NumeroOspitiPrenotazione, InfoCliente, PartenzaF, ItinerarioF)
 VALUES
     -- prenotazioni inerenti edizioni future:
-    (25,'fneri','2026-06-20','Dolomiti'),
-    (15,'srosa','2026-06-20','Dolomiti'),
-    (20,'tneri','2026-06-20','Dolomiti'),
+    -- (25,'fneri','2026-06-20','Dolomiti'),
+    -- (15,'srosa','2026-06-20','Dolomiti'),
+    -- (20,'tneri','2026-06-20','Dolomiti'),
 
-    (25,'dconti','2026-06-23','RomaClassica'),
-    (35,'lbianchi','2026-06-23','RomaClassica'),
-    (20,'tneri','2026-06-23','RomaClassica'),
-    (15,'srosa','2026-06-23','RomaClassica'),
-    (20,'gverdi','2026-06-23','RomaClassica'),
+    -- (25,'dconti','2026-06-23','RomaClassica'),
+    -- (35,'lbianchi','2026-06-23','RomaClassica'),
+    -- (20,'tneri','2026-06-23','RomaClassica'),
+    -- (15,'srosa','2026-06-23','RomaClassica'),
+    -- (20,'gverdi','2026-06-23','RomaClassica'),
 
-    (35,'dconti','2026-06-26','LaghiNord'),
-    (25,'srosa','2026-06-26','LaghiNord'),
-    (30,'vverdi','2026-06-26','LaghiNord'),
+    -- (35,'dconti','2026-06-26','LaghiNord'),
+    -- (25,'srosa','2026-06-26','LaghiNord'),
+    -- (30,'vverdi','2026-06-26','LaghiNord'),
 
     (15,'vverdi','2026-07-01','ItaliaNord');
+
+-- (10, 'fneri', '2026-05-01', 'TestScaduto'),
+-- (20, 'srosa', '2026-05-01', 'TestScaduto');
 
 INSERT INTO Prenotazione (NumeroOspitiPrenotazione, InfoCliente, PartenzaP, ItinerarioP)
 VALUES
@@ -1235,7 +1521,10 @@ INSERT INTO TramiteP VALUES
                          ('2025-03-20','GrandTourItalia',15);
 
 INSERT INTO TramiteF VALUES
-    ('2026-06-20','Dolomiti',12);
+                         ('2026-06-20','Dolomiti',12),
+
+                         ('2026-05-01', 'TestScaduto', 1),
+                         ('2026-05-01', 'TestScaduto', 2);
 -- TramiteF inerenti:
 -- ('2026-06-23','2026-06-30',275,4200,'RomaClassica'),
 -- ('2026-06-26','2026-07-03',120,3800,'LaghiNord')
@@ -1272,3 +1561,177 @@ INSERT INTO AlloggioF VALUES
 -- ('2026-06-23','2026-06-30',275,4200,'RomaClassica'),
 -- ('2026-06-26','2026-07-03',120,3800,'LaghiNord')
 -- non sono volutamente ancora stati inseriti
+
+
+-- TEST EVENTI
+
+-- DELIMITER $$
+
+-- CREATE PROCEDURE TestSpostaEdizioni()
+-- BEGIN
+
+-- handler che implementa rollback e pulizia temporary table nel caso in cui la transazione non va a buon fine
+--     DECLARE EXIT HANDLER FOR SQLEXCEPTION
+--    BEGIN
+--        ROLLBACK;
+--        DROP TEMPORARY TABLE IF EXISTS tmp_edizioni;
+--    END;
+
+-- inizio transazione
+--   START TRANSACTION;
+
+-- creazione temporary table in cui memorizzare le EdizioneViaggioFutura tali che Rientro < CURDATE()
+-- necessario per garantire che tutte le operazioni lavorino sullo stesso insieme di tuple
+--    CREATE TEMPORARY TABLE tmp_edizioni AS
+--    SELECT
+--        Partenza,
+--        Itinerario
+--    FROM EdizioneViaggioFutura
+--    WHERE Rientro < CURDATE();
+
+
+-- copia delle EdizioneViaggioFutura, presenti in tmp_edizioni, in EdizioneViaggioPassata
+--    INSERT INTO EdizioneViaggioPassata
+--    (
+--        Partenza,
+--        Rientro,
+--        NumeroOspitiTotale,
+--        CostoOperativo,
+--        Itinerario
+--    )
+--    SELECT
+--        ev.Partenza,
+--        ev.Rientro,
+--        ev.NumeroOspitiTotale,
+--        ev.CostoOperativo,
+--        ev.Itinerario
+--    FROM EdizioneViaggioFutura ev
+--    JOIN tmp_edizioni t
+--      ON ev.Partenza = t.Partenza
+--     AND ev.Itinerario = t.Itinerario;
+
+-- aggiornamento istanze di Prenotazioni con FK inerenti EdizioneViaggioFutura presenti in tmp_edizioni
+--    UPDATE Prenotazione p
+--    JOIN tmp_edizioni t
+--      ON p.PartenzaF = t.Partenza
+--     AND p.ItinerarioF = t.Itinerario
+--    SET
+--        p.PartenzaP = p.PartenzaF,
+--        p.ItinerarioP = p.ItinerarioF,
+--        p.PartenzaF = NULL,
+--        p.ItinerarioF = NULL;
+
+-- copia delle occorrenze di TramiteF, con FK inerenti EdizioneViaggioFutura presenti in tmp_edizioni, in TramiteP
+--    INSERT INTO TramiteP
+--    (
+--        Partenza,
+--        Itinerario,
+--        IDmezzo
+--    )
+--    SELECT
+--        tf.Partenza,
+-- 	tf.Itinerario,
+--        tf.IDmezzo
+--    FROM TramiteF tf
+--    JOIN tmp_edizioni t
+--      ON tf.Partenza = t.Partenza
+--     AND tf.Itinerario = t.Itinerario;
+
+-- copia delle occorrenze di AlloggioF, con FK inerenti EdizioneViaggioFutura presenti in tmp_edizioni, in AlloggioP
+--    INSERT INTO AlloggioP
+--    (
+--        EdizioneViaggio,
+--        ItinerarioViaggio,
+--        TappaNotturna,
+--        ItinerarioTappa,
+--        NomeAlbergo,
+--        Citta
+--    )
+--    SELECT
+--        af.EdizioneViaggio,
+--        af.ItinerarioViaggio,
+--        af.TappaNotturna,
+--        af.ItinerarioTappa,
+--        af.NomeAlbergo,
+--        af.Citta
+--    FROM AlloggioF af
+--    JOIN tmp_edizioni t
+--      ON af.EdizioneViaggio = t.Partenza
+--     AND af.ItinerarioViaggio = t.Itinerario;
+
+-- cancellazione delle occorrenze di TramiteF copiate in TramiteP
+--    DELETE tf
+--    FROM TramiteF tf
+--    JOIN tmp_edizioni t
+--      ON tf.Partenza = t.Partenza
+--     AND tf.Itinerario = t.Itinerario;
+
+-- cancellazione delle occorrenze di AlloggioF copiate in AlloggioP
+--    DELETE af
+--    FROM AlloggioF af
+--    JOIN tmp_edizioni t
+--      ON af.EdizioneViaggio = t.Partenza
+--     AND af.ItinerarioViaggio = t.Itinerario;
+
+-- cancellazione delle occorrenze di EdizioneViaggioFutura copiate in EdizioneViaggioPassata
+--    DELETE ev
+--    FROM EdizioneViaggioFutura ev
+--    JOIN tmp_edizioni t
+--      ON ev.Partenza = t.Partenza
+--     AND ev.Itinerario = t.Itinerario;
+
+-- pulizia e deallocazione temporary table
+--    DROP TEMPORARY TABLE IF EXISTS tmp_edizioni;
+
+-- commit della transazione
+--    COMMIT;
+
+-- END$$
+
+-- DELIMITER ;
+
+-- CALL TestSpostaEdizioni();
+
+-- deve essere VUOTO se lo spostamento è corretto
+-- SELECT *
+-- FROM EdizioneViaggioFutura
+-- WHERE Rientro < CURDATE();
+
+-- deve CONTENERE le edizioni spostate
+-- SELECT *
+-- FROM EdizioneViaggioPassata
+-- WHERE Rientro < CURDATE();
+
+-- NON devono esistere prenotazioni ancora legate a future già concluse
+-- SELECT *
+-- FROM Prenotazione
+-- WHERE PartenzaF IS NOT NULL
+-- AND ItinerarioF IS NOT NULL
+-- AND (PartenzaF, ItinerarioF) IN (
+--     SELECT Partenza, Itinerario
+--     FROM EdizioneViaggioPassata
+-- );
+
+-- devono avere FK passata valorizzata e futura NULL
+-- SELECT *
+-- FROM Prenotazione
+-- WHERE PartenzaF IS NULL
+-- AND ItinerarioF IS NULL
+-- AND PartenzaP IS NOT NULL;
+
+-- TramiteF NON deve contenere edizioni concluse
+-- SELECT *
+-- FROM TramiteF tf
+-- JOIN EdizioneViaggioPassata ev
+--  ON tf.Partenza = ev.Partenza
+-- AND tf.Itinerario = ev.Itinerario;
+
+-- SELECT *
+-- FROM AlloggioF af
+-- JOIN EdizioneViaggioPassata ev
+--   ON af.EdizioneViaggio = ev.Partenza
+-- AND af.ItinerarioViaggio = ev.Itinerario;
+
+-- SELECT
+--  (SELECT COUNT(*) FROM EdizioneViaggioFutura) AS future,
+--  (SELECT COUNT(*) FROM EdizioneViaggioPassata) AS past;
