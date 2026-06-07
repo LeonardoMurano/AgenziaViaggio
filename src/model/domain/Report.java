@@ -105,9 +105,10 @@ public class Report {
         sb.append("Itinerario: ").append(itinerario).append("\n");
         sb.append("Partenza: ").append(dataPartenza).append("\n");
         sb.append("Rientro: ").append(dataRientro).append("\n");
-        sb.append("Ospiti: ").append(numeroOspitiTotale).append("\n\n");
+        sb.append("Ospiti: ").append(numeroOspitiTotale).append("\n");
+        sb.append("Costo base itinerario: ").append(costoItinerario).append("\n\n");
 
-        sb.append(">>> UTENTI\n");
+        sb.append(">>> UTENTI PRENOTATI\n");
         utenteReport.forEach(u ->
                 sb.append("Username: ").append(u.getUsername())
                         .append(", Nome: ").append(u.getNomeUtente())
@@ -134,8 +135,9 @@ public class Report {
 
         sb.append("\n--- DATI FINALI ---\n");
         sb.append("Costo totale per ospite: ").append(costoTotalePerOspite).append("\n");
-        sb.append("Costo totale viaggio: ").append(costoTotaleViaggio).append("\n");
-        sb.append("Guadagno agenzia: ").append(guadagnoAgenzia).append("\n");
+        sb.append("Ricavato totale dal viaggio: ").append(costoTotaleViaggio).append("\n");
+        sb.append("Spese totali dell'agenzia: ").append(costoOperativo).append("\n");
+        sb.append("Guadagno totale dell'agenzia: ").append(guadagnoAgenzia).append("\n");
 
         return sb.toString();
     }

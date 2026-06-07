@@ -938,56 +938,56 @@ BEGIN
     ) THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Edizione di viaggio inesistente';
-    END IF;
+END IF;
 
     -- resultSet 1: informazioni utenti e relative prenotazioni
-    SELECT
-        u.Username,
-        u.NomeUtente,
-        u.CognomeUtente,
-        p.IDprenotazione,
-        p.NumeroOspitiPrenotazione
-    FROM Prenotazione p
-    JOIN Utente u ON u.Username = p.InfoCliente
-    WHERE p.ItinerarioP = p_itinerario
-      AND p.PartenzaP = p_partenza;
+SELECT
+    u.Username,
+    u.NomeUtente,
+    u.CognomeUtente,
+    p.IDprenotazione,
+    p.NumeroOspitiPrenotazione
+FROM Prenotazione p
+         JOIN Utente u ON u.Username = p.InfoCliente
+WHERE p.ItinerarioP = p_itinerario
+  AND p.PartenzaP = p_partenza;
 
-    -- resultSet 2: informazioni alberghi
-    SELECT
-        a.NomeAlbergo,
-        a.CostoNotteOspite,
-        tn.DurataTappa
-    FROM AlloggioP ap
-    JOIN Albergo a
-        ON a.NomeAlbergo = ap.NomeAlbergo
-       AND a.Citta = ap.Citta
-    JOIN TappaNotturna tn
-        ON tn.Numero = ap.TappaNotturna
-       AND tn.Itinerario = ap.ItinerarioTappa
-    WHERE ap.ItinerarioViaggio = p_itinerario
-      AND ap.EdizioneViaggio = p_partenza;
+-- resultSet 2: informazioni alberghi
+SELECT
+    a.NomeAlbergo,
+    a.CostoNotteOspite,
+    tn.DurataTappa
+FROM AlloggioP ap
+         JOIN Albergo a
+              ON a.NomeAlbergo = ap.NomeAlbergo
+                  AND a.Citta = ap.Citta
+         JOIN TappaNotturna tn
+              ON tn.Numero = ap.TappaNotturna
+                  AND tn.Itinerario = ap.ItinerarioTappa
+WHERE ap.ItinerarioViaggio = p_itinerario
+  AND ap.EdizioneViaggio = p_partenza;
 
-    -- resultSet 3: informazioni autobus
-    SELECT
-        au.IDmezzo,
-        au.CostoMezzo
-    FROM TramiteP tp
-    JOIN AutobusAgenzia au
-      ON au.IDmezzo = tp.IDmezzo
-    WHERE tp.Itinerario = p_itinerario
-      AND tp.Partenza = p_partenza;
+-- resultSet 3: informazioni autobus
+SELECT
+    au.IDmezzo,
+    au.CostoMezzo
+FROM TramiteP tp
+         JOIN AutobusAgenzia au
+              ON au.IDmezzo = tp.IDmezzo
+WHERE tp.Itinerario = p_itinerario
+  AND tp.Partenza = p_partenza;
 
-    -- resultSet 4: informazioni EdizioneViaggioPassata
-    SELECT
-        ev.Rientro,
-        ev.NumeroOspitiTotale,
-        ev.CostoOperativo,
-        i.CostoItinerario
-    FROM EdizioneViaggioPassata ev
-    JOIN Itinerario i
-        ON i.Nome = ev.Itinerario
-    WHERE ev.Itinerario = p_itinerario
-      AND ev.Partenza = p_partenza;
+-- resultSet 4: informazioni EdizioneViaggioPassata
+SELECT
+    ev.Rientro,
+    ev.NumeroOspitiTotale,
+    ev.CostoOperativo,
+    i.CostoItinerario
+FROM EdizioneViaggioPassata ev
+         JOIN Itinerario i
+              ON i.Nome = ev.Itinerario
+WHERE ev.Itinerario = p_itinerario
+  AND ev.Partenza = p_partenza;
 
 END$$
 
@@ -1096,7 +1096,7 @@ INSERT INTO EdizioneViaggioFutura VALUES
                                       ('2026-06-23','2026-06-30',115,4200,'RomaClassica'),
                                       ('2026-06-26','2026-07-03',90,3800,'LaghiNord'),
 
-                                      ('2026-07-01','2026-07-10',0,5000,'ItaliaNord'),
+                                      ('2026-07-01','2026-07-10',15,5000,'ItaliaNord'),
                                       ('2026-07-05','2026-07-12',0,4800,'ItaliaSud'),
                                       ('2026-07-10','2026-07-18',0,4200,'ArteToscana'),
                                       ('2026-07-20','2026-07-28',0,3800,'CittaVenete'),
@@ -1112,21 +1112,22 @@ INSERT INTO EdizioneViaggioFutura VALUES
                                       ('2026-09-20','2026-09-30',0,9000,'GrandTourItalia');
 
 INSERT INTO EdizioneViaggioPassata VALUES
+                                       ('2025-03-05','2025-03-15',55,7000,'Dolomiti'),
+                                       ('2025-02-05','2025-02-12',25,3000,'RomaClassica'),
+                                       ('2025-01-15','2025-01-22',45,4000,'LaghiNord'),
+
                                        ('2025-01-01','2025-01-10',40,5000,'ItaliaNord'),
                                        ('2025-01-05','2025-01-12',35,4800,'ItaliaSud'),
                                        ('2025-01-10','2025-01-18',30,4200,'ArteToscana'),
-                                       ('2025-01-15','2025-01-22',45,4000,'LaghiNord'),
                                        ('2025-01-20','2025-01-28',38,3800,'CittaVenete'),
                                        ('2025-02-01','2025-02-10',50,6000,'SiciliaTour'),
-                                       ('2025-02-05','2025-02-12',25,3000,'RomaClassica'),
                                        ('2025-02-10','2025-02-18',42,4500,'Costiera'),
                                        ('2025-02-15','2025-02-22',28,3500,'FoodTour'),
                                        ('2025-02-20','2025-02-28',33,4200,'MareAdriatico'),
                                        ('2025-03-01','2025-03-10',31,4200,'MareTirreno'),
-                                       ('2025-03-05','2025-03-15',55,7000,'Dolomiti'),
                                        ('2025-03-10','2025-03-18',47,5500,'PugliaTour'),
                                        ('2025-03-15','2025-03-22',39,4000,'EmiliaRomagna'),
-                                       ('2025-03-20','2025-03-30',60,9000,'GrandTourItalia');
+                                       ('2025-03-20','2025-03-30',50,9000,'GrandTourItalia');
 
 INSERT INTO TappaNotturna VALUES
                               (1,2,'Dolomiti','Milano'),
@@ -1156,7 +1157,7 @@ INSERT INTO Albergo VALUES
                         ('Hotel Napoli','Marco',80,90,'Via Napoli 1','333','333','napoli@h.it','Napoli'),
                         ('Hotel Firenze','Marco',120,70,'Via Firenze 1','444','444','firenze@h.it','Firenze'),
                         ('Hotel Venezia','Marco',150,60,'Via Venezia 1','555','555','venezia@h.it','Venezia'),
-                        ('Grande Hotel Venezia','Marco',330,220,'Via Venezia 1','555','555','venezia@h.it','Venezia'),
+                        ('Grande Hotel Venezia','Marco',330,220,'Via Venezia 1','555','555','granvenezia@h.it','Venezia'),
                         ('Hotel Palermo','Marco',110,85,'Via Palermo 1','666','666','palermo@h.it','Palermo'),
                         ('Hotel Roma','Marco',130,120,'Via Roma 2','777','777','roma@h.it','Roma'),
                         ('Grande Hotel Roma','Marco',450,260,'Via Roma 4','707','707','granroma@h.it','Roma'),
@@ -1169,23 +1170,52 @@ INSERT INTO Albergo VALUES
                         ('Hotel Genova','Marco',120,90,'Via Genova 1','105','105','genova@h.it','Genova'),
                         ('Hotel Siena','Marco',115,75,'Via Siena 1','106','106','siena@h.it','Siena');
 
+INSERT INTO Prenotazione (NumeroOspitiPrenotazione, InfoCliente, PartenzaF, ItinerarioF)
+VALUES
+    -- prenotazioni inerenti edizioni future:
+    (25,'fneri','2026-06-20','Dolomiti'),
+    (15,'srosa','2026-06-20','Dolomiti'),
+    (20,'tneri','2026-06-20','Dolomiti'),
+
+    (25,'dconti','2026-06-23','RomaClassica'),
+    (35,'lbianchi','2026-06-23','RomaClassica'),
+    (20,'tneri','2026-06-23','RomaClassica'),
+    (15,'srosa','2026-06-23','RomaClassica'),
+    (20,'gverdi','2026-06-23','RomaClassica'),
+
+    (35,'dconti','2026-06-26','LaghiNord'),
+    (25,'srosa','2026-06-26','LaghiNord'),
+    (30,'vverdi','2026-06-26','LaghiNord'),
+
+    (15,'vverdi','2026-07-01','ItaliaNord');
+
 INSERT INTO Prenotazione (NumeroOspitiPrenotazione, InfoCliente, PartenzaP, ItinerarioP)
 VALUES
-    (2,'mrossi','2025-01-01','ItaliaNord'),
-    (3,'lbianchi','2025-01-05','ItaliaSud'),
-    (1,'gverdi','2025-01-10','ArteToscana'),
-    (4,'fneri','2025-01-15','LaghiNord'),
-    (2,'dconti','2025-01-20','CittaVenete'),
-    (5,'srosa','2025-02-01','SiciliaTour'),
-    (2,'vverdi','2025-02-05','RomaClassica'),
-    (3,'tneri','2025-02-10','Costiera'),
-    (2,'mrossi','2025-02-15','FoodTour'),
-    (1,'lbianchi','2025-02-20','MareAdriatico'),
-    (2,'gverdi','2025-03-01','MareTirreno'),
-    (4,'fneri','2025-03-05','Dolomiti'),
-    (3,'dconti','2025-03-10','PugliaTour'),
-    (2,'srosa','2025-03-15','EmiliaRomagna'),
-    (5,'vverdi','2025-03-20','GrandTourItalia');
+    -- prenotazioni inerenti edizioni passate:
+    (25,'fneri','2025-03-05','Dolomiti'),
+    (15,'dconti','2025-03-05','Dolomiti'),
+    (15,'gverdi','2025-03-05','Dolomiti'),
+
+    (15,'vverdi','2025-02-05','RomaClassica'),
+    (10,'srosa','2025-02-05','RomaClassica'),
+
+    (10,'mrossi','2025-01-15','LaghiNord'),
+    (5,'lbianchi','2025-01-15','LaghiNord'),
+    (10,'gverdi','2025-01-15','LaghiNord'),
+    (10,'tneri','2025-01-15','LaghiNord'),
+
+    (40,'srosa','2025-01-01','ItaliaNord'),
+    (35,'lbianchi','2025-01-05','ItaliaSud'),
+    (30,'gverdi','2025-01-10','ArteToscana'),
+    (38,'dconti','2025-01-20','CittaVenete'),
+    (50,'srosa','2025-02-01','SiciliaTour'),
+    (42,'tneri','2025-02-10','Costiera'),
+    (28,'mrossi','2025-02-15','FoodTour'),
+    (33,'lbianchi','2025-02-20','MareAdriatico'),
+    (31,'gverdi','2025-03-01','MareTirreno'),
+    (47,'dconti','2025-03-10','PugliaTour'),
+    (39,'srosa','2025-03-15','EmiliaRomagna'),
+    (50,'vverdi','2025-03-20','GrandTourItalia');
 
 INSERT INTO TramiteP VALUES
                          ('2025-01-01','ItaliaNord',1),
@@ -1193,7 +1223,7 @@ INSERT INTO TramiteP VALUES
                          ('2025-01-10','ArteToscana',3),
                          ('2025-01-15','LaghiNord',4),
                          ('2025-01-20','CittaVenete',5),
-                         ('2025-02-01','SiciliaTour',6),
+                         ('2025-02-01','SiciliaTour',12),
                          ('2025-02-05','RomaClassica',7),
                          ('2025-02-10','Costiera',8),
                          ('2025-02-15','FoodTour',9),
@@ -1212,19 +1242,25 @@ INSERT INTO TramiteF VALUES
 -- non sono volutamente ancora stati inseriti
 
 INSERT INTO AlloggioP VALUES
+                          ('2025-03-05','Dolomiti',1,'Dolomiti','Hotel Milano','Milano'),
+                          ('2025-03-05','Dolomiti',2,'Dolomiti','Hotel Verona','Verona'),
+                          ('2025-03-05','Dolomiti',3,'Dolomiti','Hotel Torino','Torino'),
+
+                          ('2025-02-05','RomaClassica',1,'RomaClassica','Hotel Roma','Roma'),
+
+                          ('2025-01-15','LaghiNord',1,'LaghiNord','Hotel Venezia','Venezia'),
+                          ('2025-01-15','LaghiNord',2,'LaghiNord','Hotel Verona','Verona'),
+
                           ('2025-01-01','ItaliaNord',1,'ItaliaNord','Hotel Milano','Milano'),
                           ('2025-01-01','ItaliaNord',2,'ItaliaNord','Hotel Torino','Torino'),
                           ('2025-01-05','ItaliaSud',1,'ItaliaSud','Hotel Napoli','Napoli'),
                           ('2025-01-10','ArteToscana',1,'ArteToscana','Hotel Firenze','Firenze'),
-                          ('2025-01-15','LaghiNord',1,'LaghiNord','Hotel Verona','Verona'),
                           ('2025-01-20','CittaVenete',1,'CittaVenete','Hotel Venezia','Venezia'),
                           ('2025-02-01','SiciliaTour',1,'SiciliaTour','Hotel Palermo','Palermo'),
-                          ('2025-02-05','RomaClassica',1,'RomaClassica','Hotel Roma','Roma'),
                           ('2025-02-10','Costiera',1,'Costiera','Hotel Napoli','Napoli'),
                           ('2025-02-15','FoodTour',1,'FoodTour','Hotel Parma','Parma'),
                           ('2025-02-20','MareAdriatico',1,'MareAdriatico','Hotel Bari','Bari'),
                           ('2025-03-01','MareTirreno',1,'MareTirreno','Hotel Genova','Genova'),
-                          ('2025-03-05','Dolomiti',1,'Dolomiti','Hotel Verona','Verona'),
                           ('2025-03-10','PugliaTour',1,'PugliaTour','Hotel Lecce','Lecce'),
                           ('2025-03-15','EmiliaRomagna',1,'EmiliaRomagna','Hotel Bologna','Bologna');
 

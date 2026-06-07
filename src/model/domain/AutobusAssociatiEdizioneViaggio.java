@@ -20,7 +20,7 @@ public class AutobusAssociatiEdizioneViaggio {
 
     //definizione metodo di calcolo attributi derivati
     private void calcolaDerivati() {
-        this.capienzaResidua = capienzaTotale - capienzaTotale;
+        this.capienzaResidua = capienzaRichiesta - capienzaTotale;
         this.necessitaAltriAutobus = capienzaResidua > 0;
     }
 
