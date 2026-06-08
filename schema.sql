@@ -1,5 +1,3 @@
-
-
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
@@ -105,7 +103,15 @@ CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`Prenotazione` (
     REFERENCES `AgenziaViaggio`.`EdizioneViaggioFutura` (`Partenza` , `Itinerario`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-    CHECK (`NumeroOspitiPrenotazione` > 0))
+    CHECK (`NumeroOspitiPrenotazione` > 0),
+    CHECK (
+(`PartenzaF` IS NOT NULL AND `PartenzaP` IS NULL)
+    OR (`PartenzaF` IS NULL AND `PartenzaP` IS NOT NULL)
+    ),
+    CHECK (
+(`ItinerarioF` IS NOT NULL AND `ItinerarioP` IS NULL)
+    OR (`ItinerarioF` IS NULL AND `ItinerarioP` IS NOT NULL)
+    ))
     ENGINE = InnoDB;
 
 CREATE INDEX `fk_Prenotazione_Cliente_idx` ON `AgenziaViaggio`.`Prenotazione` (`InfoCliente` ASC) VISIBLE;
@@ -155,7 +161,8 @@ CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`TappaNotturna` (
     REFERENCES `AgenziaViaggio`.`Citta` (`NomeCitta`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-    CHECK (`DurataTappa` > 0))
+    CHECK (`DurataTappa` > 0),
+    CHECK (`Numero` > 0))
     ENGINE = InnoDB;
 
 CREATE INDEX `fk_TappaNotturna_Itinerario1_idx` ON `AgenziaViaggio`.`TappaNotturna` (`Itinerario` ASC) VISIBLE;
@@ -330,6 +337,10 @@ BEGIN
     -- definizione variabile locale v_ruolo
     DECLARE v_ruolo ENUM('Cliente','Agente');
 
+	-- dichiarazione handler che forza v_ruolo = NULL nel caso in cui le credenziali sono errate
+	DECLARE CONTINUE HANDLER FOR NOT FOUND
+		SET v_ruolo = NULL;
+
     -- ricerca Utente con p_username, p_password e memorizza il suo Ruolo in v_ruolo
 SELECT Ruolo
 INTO v_ruolo
@@ -369,9 +380,20 @@ CREATE PROCEDURE registraPrenotazione(
     OUT p_idPrenotazione INT
 )
 BEGIN
-    -- inserisce in Prenotazione la tupla definita dai valori in input:
-    -- una nuova prenotazione deve sempre riferirsi ad una EdizioneViaggioFutura dunque si forzano PartenzaP, ItinerarioP a NULL
-    -- idPrenotazione è autogenerato: viene omesso nell'INSERT
+	-- gestione errori: se qualcosa fallisce -> rollback e resignal
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+ROLLBACK;
+RESIGNAL;
+END;
+
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+-- inizio della transazione
+START TRANSACTION;
+
+-- inserisce in Prenotazione la tupla definita dai valori in input:
+-- una nuova prenotazione deve sempre riferirsi ad una EdizioneViaggioFutura dunque si forzano PartenzaP, ItinerarioP a NULL
+-- idPrenotazione è autogenerato: viene omesso nell'INSERT
 INSERT INTO Prenotazione (
     NumeroOspitiPrenotazione,
     InfoCliente,
@@ -390,8 +412,10 @@ VALUES (
        );
 
 -- ritorna al chiamante idPrenotazione che è autogenerato nella BD
--- LAST_INSERT_ID() è specifico della connessione corrente: non è necessario implementare una transazione
 SET p_idPrenotazione = LAST_INSERT_ID();
+
+    -- fine della transazione
+COMMIT;
 
 END$$
 
@@ -410,16 +434,27 @@ CREATE PROCEDURE cancellaPrenotazione(
 )
 BEGIN
 
-    -- definizione variabili locali
+	-- definizione variabili locali
     DECLARE v_partenza DATE;
     DECLARE v_cliente VARCHAR(16);
 
-    -- se la successiva SELECT non trova righe forza v_cliente = NULL rendendo i successivi controlli affidabili
-    -- necessario in quanto il comportamento di MySQL in seguito ad evento NOT FOUND è imprevedibile
+    -- gestione errori: se qualcosa fallisce -> rollback e resignal
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+ROLLBACK;
+RESIGNAL;
+END;
+
+	-- se la successiva SELECT non trova righe forza v_cliente = NULL rendendo i successivi controlli affidabili
     DECLARE CONTINUE HANDLER FOR NOT FOUND
     SET v_cliente = NULL;
 
-    -- recupera i dati della prenotazione in base ad p_idPrenotazione
+
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+-- inizio della transazione
+START TRANSACTION;
+
+-- recupera i dati della prenotazione in base ad p_idPrenotazione
 SELECT InfoCliente, PartenzaF
 INTO v_cliente, v_partenza
 FROM Prenotazione
@@ -428,20 +463,23 @@ WHERE IDprenotazione = p_idPrenotazione;
 -- verifica se la prenotazione esiste
 -- se la prenotazione non esiste, allora v_cliente==NULL
 IF v_cliente IS NULL THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Prenotazione inesistente';
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'Prenotazione inesistente';
 END IF;
 
-    -- implementazione regola aziendale:
-    -- verifica che la prenotazione appartenga al cliente che ne richiede la cancellazione
-    IF v_cliente <> p_username THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'La prenotazione non appartiene al cliente';
+		-- implementazione regola aziendale:
+		-- verifica che la prenotazione appartenga al cliente che ne richiede la cancellazione
+		IF v_cliente <> p_username THEN
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'La prenotazione non appartiene al cliente';
 END IF;
 
-    -- cancellazione della prenotazione identificata da p_idPrenotazione
+		-- cancellazione della prenotazione identificata da p_idPrenotazione
 DELETE FROM Prenotazione
 WHERE IDprenotazione = p_idPrenotazione;
+
+-- fine della transazione
+COMMIT;
 
 END$$
 
@@ -468,16 +506,27 @@ BEGIN
     DECLARE v_pos INT;
     DECLARE v_token TEXT;
 
-    -- implementazione regola aziendale:
-    -- verifica che l'Itinerario sia composto da almeno una tappa valida
-    -- non è valida se (p_tappe == NULL) or (p_tappe eliminando gli spazi == NULL) or (#':' == 0)
-    IF p_tappe IS NULL OR LENGTH(TRIM(p_tappe)) = 0 OR LOCATE(':', p_tappe) = 0 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Serve almeno una tappa valida';
+	-- gestione errori: se qualcosa fallisce -> rollback e resignal
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+ROLLBACK;
+RESIGNAL;
+END;
+
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+-- inizio della transazione
+START TRANSACTION;
+
+-- implementazione regola aziendale:
+-- verifica che l'Itinerario sia composto da almeno una tappa valida
+-- non è valida se (p_tappe == NULL) or (p_tappe eliminando gli spazi == NULL) or (#':' == 0)
+IF p_tappe IS NULL OR LENGTH(TRIM(p_tappe)) = 0 OR LOCATE(':', p_tappe) = 0 THEN
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'Serve almeno una tappa valida';
 END IF;
 
 
-    -- registrazione Itinerario
+		-- registrazione Itinerario
 INSERT INTO Itinerario (Nome, CostoItinerario)
 VALUES (p_nomeItinerario, p_costo);
 
@@ -485,47 +534,47 @@ VALUES (p_nomeItinerario, p_costo);
 
 -- continua fino a quando ci sono tappe da leggere
 WHILE LENGTH(p_tappe) > 0 DO
-        -- cerca il prossimo blocco (i blocchi sono separati da ';')
-        SET v_pos = LOCATE(';', p_tappe);
-        -- se non viene trovato nessun ';' allora è l'ultimo blocco:
-        IF v_pos = 0 THEN
-           -- estrae tutto il contenuto di p_tappe e svuota la stringa
-            SET v_token = p_tappe;
-            SET p_tappe = '';
-        -- se viene trovato un ';' allora è un blocco intermedio:
+			-- cerca il prossimo blocco (i blocchi sono separati da ';')
+			SET v_pos = LOCATE(';', p_tappe);
+			-- se non viene trovato nessun ';' allora è l'ultimo blocco:
+			IF v_pos = 0 THEN
+				-- estrae tutto il contenuto di p_tappe e svuota la stringa
+				SET v_token = p_tappe;
+				SET p_tappe = '';
+			-- se viene trovato un ';' allora è un blocco intermedio:
 ELSE
-            -- estrae solo la sottostringa di p_tappe che precede ';'
-            SET v_token = SUBSTRING(p_tappe, 1, v_pos - 1);
-            -- aggiorna la stringa p_tappe eliminando la parte appena letta
-            SET p_tappe = SUBSTRING(p_tappe, v_pos + 1);
+				-- estrae solo la sottostringa di p_tappe che precede ';'
+				SET v_token = SUBSTRING(p_tappe, 1, v_pos - 1);
+				-- aggiorna la stringa p_tappe eliminando la parte appena letta
+				SET p_tappe = SUBSTRING(p_tappe, v_pos + 1);
 END IF;
 
-        -- parsing interno numero:durata:citta
+			-- parsing interno numero:durata:citta
 
-        -- prende il primo segmento separato da ':'
-        SET v_numero = SUBSTRING_INDEX(v_token, ':', 1);
-        -- prende i primi 2 segmenti separati da ':'
-        -- dal risultato intermedio, prende l'ultimo segmento separato da ':'
-        SET v_durata = SUBSTRING_INDEX(SUBSTRING_INDEX(v_token, ':', 2), ':', -1);
-        -- prende l'ultimo segmento separato da ':'
-        SET v_citta  = SUBSTRING_INDEX(v_token, ':', -1);
+			-- prende il primo segmento separato da ':'
+			SET v_numero = SUBSTRING_INDEX(v_token, ':', 1);
+			-- prende i primi 2 segmenti separati da ':'
+			-- dal risultato intermedio, prende l'ultimo segmento separato da ':'
+			SET v_durata = SUBSTRING_INDEX(SUBSTRING_INDEX(v_token, ':', 2), ':', -1);
+			-- prende l'ultimo segmento separato da ':'
+			SET v_citta  = SUBSTRING_INDEX(v_token, ':', -1);
 
-        -- inserimento tappa i-esimaa estratta da input serializzato
+			-- inserimento tappa i-esimaa estratta da input serializzato
 INSERT INTO TappaNotturna (
     numero,
     durataTappa,
     itinerario,
     citta
-
 )
 VALUES (
            v_numero,
            v_durata,
            p_nomeItinerario,
            v_citta
-
        );
 END WHILE;
+
+COMMIT;
 
 END$$
 
@@ -549,17 +598,19 @@ BEGIN
     DECLARE v_durataTotale INT;
     DECLARE v_dataRientro DATE;
 
-    -- verifica che la data della partenza sia tra >=20 giorni:
-    -- vincolo che è diretta conseguenza della regola aziendale secondo la quale
-    -- è possibile effettuare prenotazioni quando mancano >=20 giorni alla partenza
-    -- non implementato con trigger per motivi di efficienza del sistema
-    IF DATEDIFF(p_dataPartenza, CURRENT_DATE()) < 20 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'La data di partenza deve essere almeno 20 giorni successiva alla data odierna';
-END IF;
+    -- gestione errori: se qualcosa fallisce -> rollback e resignal
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+ROLLBACK;
+RESIGNAL;
+END;
 
-    -- ricavo la durataTotale dell'Itinerario
-    -- COALESCE serve a forzare a 0 SUM(DurataTappa) nel caso in cui essa risulta essere NULL
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+-- inizio della transazione
+START TRANSACTION;
+
+-- ricavo la durataTotale dell'Itinerario
+-- COALESCE serve a forzare a 0 SUM(DurataTappa) nel caso in cui essa risulta essere NULL
 SELECT COALESCE(SUM(DurataTappa), 0)
 INTO v_durataTotale
 FROM TappaNotturna
@@ -567,10 +618,10 @@ WHERE Itinerario = p_nomeItinerario;
 
 -- imposta v_dataRientro = p_dataPartenza + v_durataTotale
 SET v_dataRientro =
-        DATE_ADD(p_dataPartenza, INTERVAL v_durataTotale DAY);
+			DATE_ADD(p_dataPartenza, INTERVAL v_durataTotale DAY);
 
-    -- inserimento della nuova EdizioneViaggioFutura
-    -- al momento della creazione, NumeroOspitiTotale == 0 sempre
+		-- inserimento della nuova EdizioneViaggioFutura
+		-- al momento della creazione, NumeroOspitiTotale == 0 sempre
 INSERT INTO EdizioneViaggioFutura (
     Partenza,
     Rientro,
@@ -585,6 +636,8 @@ VALUES (
            p_costoOperativo,
            p_nomeItinerario
        );
+
+COMMIT;
 
 END $$
 
@@ -651,7 +704,6 @@ CREATE PROCEDURE registraAutobusAgenzia(
     OUT p_idMezzo INT
 )
 BEGIN
-
     -- inserimento del nuovo AutobusAgenzia
     -- l'attributo idMezzo è autogenerato nel DB
 INSERT INTO AutobusAgenzia (
@@ -689,24 +741,22 @@ BEGIN
     -- dichiarazione variabili locali
     DECLARE v_rientro DATE;
 
-    -- implementazione regola aziendale:
-    -- verifica che che l'associazione sia inerente un'EdizioneViaggioFutura con partenza prevista tra 0 e 20 giorni
-    IF DATEDIFF(p_partenza, CURDATE()) < 0 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Data di partenza già trascorsa';
-END IF;
+    -- gestione errori: se qualcosa fallisce -> rollback e resignal
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+ROLLBACK;
+RESIGNAL;
+END;
 
-    IF DATEDIFF(p_partenza, CURDATE()) > 20 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Associazione non consentita: più di 20 giorni alla partenza';
-END IF;
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+-- inizio della transazione
+START TRANSACTION;
 
-    -- inserimento nuova occorrenza di TramiteF
+-- inserimento nuova occorrenza di TramiteF
 INSERT INTO TramiteF (Partenza, Itinerario, IDmezzo)
 VALUES (p_partenza, p_itinerario, p_idmezzo);
 
 -- calcolo della capienza totale (sommatoria delle capienze di ogni Autobus associato all'EdizioneViaggioFutura)
--- COALESCE(., 0) sostituisce al risultato NULL il valore 0
 SELECT COALESCE(SUM(A.Capienza), 0)
 INTO p_capienzaTotale
 FROM TramiteF TF
@@ -725,6 +775,8 @@ WHERE Partenza = p_partenza
 -- implementazione regola aziendale:
 -- l'output restituito serve ad implementare la stampa di un warning nel caso in cui:
 -- p_numeroOspitiTotale > p_capienzaTotale
+
+COMMIT;
 
 END $$
 
@@ -746,37 +798,18 @@ CREATE PROCEDURE associaAlbergo(
 )
 BEGIN
 
-    -- dichiarazione variabili locali
-    DECLARE v_count INT;
+   -- gestione errori: se qualcosa fallisce -> rollback e resignal
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+ROLLBACK;
+RESIGNAL;
+END;
 
-    -- verifica esistenza edizione futura
-    -- controllo necessario per evitare messaggio di errore grezzo
-SELECT COUNT(*)
-INTO v_count
-FROM EdizioneViaggioFutura EV
-WHERE EV.Itinerario = p_itinerario
-  AND EV.Partenza = p_partenza;
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+-- inizio della transazione
+START TRANSACTION;
 
-IF v_count = 0 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT =
-        'Edizione di viaggio inesistente';
-END IF;
-
-    -- implementazione regola aziendale:
-    -- verifica che che l'associazione sia inerente un'EdizioneViaggioFutura con partenza prevista tra 0 e 20 giorni
-    IF DATEDIFF(p_partenza, CURDATE()) < 0 THEN
-    SIGNAL SQLSTATE '45000'
-    SET MESSAGE_TEXT =
-    'Data di partenza già trascorsa';
-END IF;
-
-   IF DATEDIFF(p_partenza, CURDATE()) > 20 THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Associazione non consentita: più di 20 giorni alla partenza';
-END IF;
-
-    -- inserimento nuova occorrenza di AlloggioF
+-- inserimento nuova occorrenza di AlloggioF
 INSERT INTO AlloggioF(
     EdizioneViaggio,
     ItinerarioViaggio,
@@ -793,6 +826,8 @@ VALUES(
           p_nomeAlbergo,
           p_citta
       );
+
+COMMIT;
 
 END$$
 
@@ -899,6 +934,8 @@ END IF;
 
 END $$
 
+DELIMITER;
+
 DELIMITER $$
 
 CREATE TRIGGER trg_update_ospiti_after_insert
@@ -908,13 +945,7 @@ BEGIN
 
     -- aggiorna il totale ospiti dell'edizione futura associata alla nuova prenotazione registrata
     UPDATE EdizioneViaggioFutura
-    SET NumeroOspitiTotale =
-            (
-                SELECT COALESCE(SUM(NumeroOspitiPrenotazione), 0)
-                FROM Prenotazione
-                WHERE PartenzaF = NEW.PartenzaF
-                  AND ItinerarioF = NEW.ItinerarioF
-            )
+    SET NumeroOspitiTotale = COALESCE(NumeroOspitiTotale, 0) + NEW.NumeroOspitiPrenotazione
     WHERE Partenza = NEW.PartenzaF
       AND Itinerario = NEW.ItinerarioF;
 
@@ -937,58 +968,65 @@ DELIMITER $$
         DECLARE v_partenza DATE;
 
     -- sceglie se usare PartenzaF o PartenzaP nel controllo in base a quale delle due è NULL
-    IF OLD.PartenzaF IS NOT NULL THEN
-        SET v_partenza = OLD.PartenzaF;
-        ELSE
-        SET v_partenza = OLD.PartenzaP;
-    END IF;
+	SET v_partenza = COALESCE(OLD.PartenzaF, OLD.PartenzaP);
 
-    -- verifica della validità dell'occorrenza di Prenotazione
-    IF v_partenza IS NULL THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Prenotazione senza data valida';
-END IF;
-
--- implementazione regola aziendale:
--- verifica che la cancellazione della prenotazione sia inerente un viaggio con partenza prevista tra >=20 giorni
-IF DATEDIFF(v_partenza, CURRENT_DATE()) < 20 THEN
+	-- implementazione regola aziendale:
+    -- verifica che la cancellazione della prenotazione sia inerente un viaggio con partenza prevista tra >=20 giorni
+    IF DATEDIFF(v_partenza, CURRENT_DATE()) < 20 THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT =
         'Cancellazione non consentita: meno di 20 giorni alla partenza';
-END IF;
-
-END$$
-
-DELIMITER ;
-
-DELIMITER $$
-
-CREATE TRIGGER trg_update_ospiti_after_delete
-    AFTER DELETE ON Prenotazione
-    FOR EACH ROW
-BEGIN
-
-    -- aggiorna il totale ospiti dell'edizione futura associata alla prenotazione cancellata
-    UPDATE EdizioneViaggioFutura
-    SET NumeroOspitiTotale =
-            (
-                SELECT COALESCE(SUM(NumeroOspitiPrenotazione), 0)
-                FROM Prenotazione
-                WHERE PartenzaF = OLD.PartenzaF
-                  AND ItinerarioF = OLD.ItinerarioF
-            )
-    WHERE Partenza = OLD.PartenzaF
-      AND Itinerario = OLD.ItinerarioF;
+    END IF;
 
     END$$
 
     DELIMITER ;
 
+DELIMITER $$
+
+    CREATE TRIGGER trg_update_ospiti_after_delete
+        AFTER DELETE ON Prenotazione
+        FOR EACH ROW
+    BEGIN
+
+        -- aggiorna il totale ospiti dell'edizione futura associata alla prenotazione cancellata
+        UPDATE EdizioneViaggioFutura
+        SET NumeroOspitiTotale = COALESCE(NumeroOspitiTotale, 0) - OLD.NumeroOspitiPrenotazione
+        WHERE Partenza = OLD.PartenzaF
+          AND Itinerario = OLD.ItinerarioF;
+
+        END$$
+
+        DELIMITER ;
+
+
 -- -----------------------------------------------------
--- Triggers attivati da `AgenziaViaggio`.`associaAutobusAgenzia`
+-- Triggers attivati da `AgenziaViaggio`.`registraEdizioneViaggio`
 -- -----------------------------------------------------
 
 DELIMITER $$
+
+        CREATE TRIGGER trg_check_data_partenza
+            BEFORE INSERT ON EdizioneViaggioFutura
+            FOR EACH ROW
+        BEGIN
+            -- verifica che la data della partenza sia tra >=20 giorni:
+            -- vincolo che è diretta conseguenza della regola aziendale secondo la quale
+            -- è possibile effettuare prenotazioni quando mancano >=20 giorni alla partenza
+            IF DATEDIFF(NEW.Partenza, CURRENT_DATE()) < 20 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'La data di partenza deve essere almeno 20 giorni successiva alla data odierna';
+        END IF;
+    END $$
+
+DELIMITER;
+
+
+    -- -----------------------------------------------------
+-- Triggers attivati da `AgenziaViaggio`.`associaAutobusAgenzia`
+-- -----------------------------------------------------
+
+    DELIMITER $$
 
     CREATE TRIGGER trg_check_autobus_sovrapposizione
         BEFORE INSERT ON TramiteF
@@ -1030,6 +1068,28 @@ END IF;
 END$$
 
 DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_check_partenza_autobus
+    BEFORE INSERT ON TramiteF
+    FOR EACH ROW
+BEGIN
+    -- implementazione regola aziendale:
+    -- verifica che che l'associazione sia inerente un'EdizioneViaggioFutura con partenza prevista tra 0 e 20 giorni
+
+    IF DATEDIFF(NEW.Partenza, CURDATE()) < 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Data di partenza già trascorsa';
+END IF;
+
+IF DATEDIFF(NEW.Partenza, CURDATE()) > 20 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Associazione non consentita: più di 20 giorni alla partenza';
+END IF;
+END $$
+
+DELIMITER;
 
 
 -- -----------------------------------------------------
@@ -1130,6 +1190,44 @@ END$$
 
 DELIMITER ;
 
+DELIMITER $$
+
+CREATE TRIGGER trg_check_edizione_temporale_alloggio
+    BEFORE INSERT ON AlloggioF
+    FOR EACH ROW
+BEGIN
+
+    DECLARE v_dataPartenza DATE;
+
+    -- recupero la data di partenza dell’edizione
+    SELECT EV.Partenza
+    INTO v_dataPartenza
+    FROM EdizioneViaggioFutura EV
+    WHERE EV.Partenza = NEW.EdizioneViaggio
+      AND EV.Itinerario = NEW.ItinerarioViaggio;
+
+    -- verifica dell'esistenza dell'edizione
+    IF v_dataPartenza IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'EdizioneViaggioFutura non valida';
+END IF;
+
+-- implementazione regola aziendale:
+-- verifica che che l'associazione sia inerente un'EdizioneViaggioFutura con partenza prevista tra 0 e 20 giorni
+IF DATEDIFF(v_dataPartenza, CURDATE()) < 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Data di partenza già trascorsa';
+END IF;
+
+    IF DATEDIFF(v_dataPartenza, CURDATE()) > 20 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Associazione non consentita: più di 20 giorni alla partenza';
+END IF;
+
+END $$
+
+DELIMITER ;
+
 
 -- -----------------------------------------------------
 -- EVENTS
@@ -1157,7 +1255,8 @@ ROLLBACK;
 DROP TEMPORARY TABLE IF EXISTS tmp_edizioni;
 END;
 
-	-- inizio transazione
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+-- inizio transazione
 START TRANSACTION;
 
 -- creazione temporary table in cui memorizzare le EdizioneViaggioFutura tali che Rientro < CURDATE()
@@ -1266,7 +1365,7 @@ DELETE tf
 	-- commit della transazione
 COMMIT;
 
-END$$
+END $$
 
 DELIMITER ;
 
@@ -1371,9 +1470,9 @@ INSERT INTO AutobusAgenzia (CostoMezzo, Capienza) VALUES
                                                       (6000,55);
 
 INSERT INTO EdizioneViaggioFutura VALUES
-                                      ('2026-06-20','2026-06-25',60,3800,'Dolomiti'),
-                                      ('2026-06-23','2026-06-30',115,4200,'RomaClassica'),
-                                      ('2026-06-26','2026-07-03',90,3800,'LaghiNord'),
+                                      -- ('2026-06-20','2026-06-25',60,3800,'Dolomiti'),
+                                      -- ('2026-06-23','2026-06-30',115,4200,'RomaClassica'),
+                                      -- ('2026-06-26','2026-07-03',90,3800,'LaghiNord'),
 
                                       ('2026-07-01','2026-07-10',15,5000,'ItaliaNord'),
                                       ('2026-07-05','2026-07-12',0,4800,'ItaliaSud'),
@@ -1388,9 +1487,9 @@ INSERT INTO EdizioneViaggioFutura VALUES
                                       ('2026-09-05','2026-09-15',0,7000,'Dolomiti'),
                                       ('2026-09-10','2026-09-18',0,5500,'PugliaTour'),
                                       ('2026-09-15','2026-09-22',0,4000,'EmiliaRomagna'),
-                                      ('2026-09-20','2026-09-30',0,9000,'GrandTourItalia'),
+                                      ('2026-09-20','2026-09-30',0,9000,'GrandTourItalia');
 
-                                      ('2026-05-01','2026-05-05',30,2000,'TestScaduto');
+-- ('2026-05-01','2026-05-05',30,2000,'TestScaduto');
 
 INSERT INTO EdizioneViaggioPassata VALUES
                                        ('2025-03-05','2025-03-15',55,7000,'Dolomiti'),
@@ -1520,11 +1619,11 @@ INSERT INTO TramiteP VALUES
                          ('2025-03-15','EmiliaRomagna',14),
                          ('2025-03-20','GrandTourItalia',15);
 
-INSERT INTO TramiteF VALUES
-                         ('2026-06-20','Dolomiti',12),
+-- INSERT INTO TramiteF VALUES
+-- ('2026-06-20','Dolomiti',12),
 
-                         ('2026-05-01', 'TestScaduto', 1),
-                         ('2026-05-01', 'TestScaduto', 2);
+-- ('2026-05-01', 'TestScaduto', 1),
+-- ('2026-05-01', 'TestScaduto', 2);
 -- TramiteF inerenti:
 -- ('2026-06-23','2026-06-30',275,4200,'RomaClassica'),
 -- ('2026-06-26','2026-07-03',120,3800,'LaghiNord')
@@ -1553,10 +1652,10 @@ INSERT INTO AlloggioP VALUES
                           ('2025-03-10','PugliaTour',1,'PugliaTour','Hotel Lecce','Lecce'),
                           ('2025-03-15','EmiliaRomagna',1,'EmiliaRomagna','Hotel Bologna','Bologna');
 
-INSERT INTO AlloggioF VALUES
-                          ('2026-06-20','Dolomiti',1,'Dolomiti','Hotel Milano','Milano'),
-                          ('2026-06-20','Dolomiti',2,'Dolomiti','Hotel Verona','Verona'),
-                          ('2026-06-20','Dolomiti',3,'Dolomiti','Hotel Torino','Torino');
+-- INSERT INTO AlloggioF VALUES
+--                       ('2026-06-20','Dolomiti',1,'Dolomiti','Hotel Milano','Milano'),
+--                       ('2026-06-20','Dolomiti',2,'Dolomiti','Hotel Verona','Verona'),
+--                       ('2026-06-20','Dolomiti',3,'Dolomiti','Hotel Torino','Torino');
 -- AlloggioF inerenti:
 -- ('2026-06-23','2026-06-30',275,4200,'RomaClassica'),
 -- ('2026-06-26','2026-07-03',120,3800,'LaghiNord')
