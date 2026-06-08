@@ -162,7 +162,7 @@ CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`TappaNotturna` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
     CHECK (`DurataTappa` > 0),
-    CHECK (`Numero` > 0)
+    CHECK (`Numero` > 0))
     ENGINE = InnoDB;
 
 CREATE INDEX `fk_TappaNotturna_Itinerario1_idx` ON `AgenziaViaggio`.`TappaNotturna` (`Itinerario` ASC) VISIBLE;

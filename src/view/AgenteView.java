@@ -99,10 +99,10 @@ public class AgenteView {
             List<String> citta = new ArrayList<>();
 
             //richiesta in input delle informazioni inerenti ogni tappa
-            for (int i = 0; i < counterTappe; i++) {
-                System.out.print("Durata tappa " + (i+1) + "-esima: ");
+            for (int i = 1; i <= counterTappe; i++) {
+                System.out.print("Durata tappa " + (i) + "-esima: ");
                 String stringDurataTappa = input.nextLine();
-                System.out.print("Città tappa " + (i+1) + "-esima: ");
+                System.out.print("Città tappa " + (i) + "-esima: ");
                 citta.add(input.nextLine());
                 durataTappa.add(Integer.parseInt(stringDurataTappa));
                 numeroTappa.add(i);
