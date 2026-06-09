@@ -66,15 +66,16 @@ CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`EdizioneViaggioFutura` (
     `CostoOperativo` DECIMAL(10,2) UNSIGNED NOT NULL,
     `Itinerario` VARCHAR(100) NOT NULL,
     PRIMARY KEY (`Partenza`, `Itinerario`),
-    CONSTRAINT `fk_EdizioneViaggioPassata_Itinerario10`
+    CONSTRAINT `fk_EdizioneViaggioFutura_Itinerario1`
     FOREIGN KEY (`Itinerario`)
     REFERENCES `AgenziaViaggio`.`Itinerario` (`Nome`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
     ENGINE = InnoDB;
 
-CREATE INDEX `fk_EdizioneViaggioPassata_Itinerario1_idx` ON `AgenziaViaggio`.`EdizioneViaggioFutura` (`Itinerario` ASC) VISIBLE;
+CREATE INDEX `fk_EdizioneViaggioFutura_Itinerario1_idx` ON `AgenziaViaggio`.`EdizioneViaggioFutura` (`Itinerario` ASC) VISIBLE;
 
+CREATE INDEX `idx_edizioneViaggioFutura_rientro` ON `AgenziaViaggio`.`EdizioneViaggioFutura` (`Rientro` ASC) VISIBLE;
 
 -- -----------------------------------------------------
 -- Table `AgenziaViaggio`.`Prenotazione`
@@ -275,9 +276,7 @@ CREATE TABLE IF NOT EXISTS `AgenziaViaggio`.`AlloggioP` (
 
 CREATE INDEX `fk_AlloggioP_TappaNotturna1_idx` ON `AgenziaViaggio`.`AlloggioP` (`TappaNotturna` ASC, `ItinerarioTappa` ASC) VISIBLE;
 
-CREATE INDEX `fk_AlloggioP_Albergo1_idx` ON `AgenziaViaggio`.`AlloggioP` (`NomeAlbergo` ASC, `Citta` ASC) INVISIBLE;
-
-CREATE INDEX `report_alloggioP` ON `AgenziaViaggio`.`AlloggioP` (`EdizioneViaggio` ASC, `ItinerarioViaggio` ASC) VISIBLE;
+CREATE INDEX `fk_AlloggioP_Albergo1_idx` ON `AgenziaViaggio`.`AlloggioP` (`NomeAlbergo` ASC, `Citta` ASC) VISIBLE;
 
 
 -- -----------------------------------------------------
