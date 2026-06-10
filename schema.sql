@@ -1369,16 +1369,16 @@ DELIMITER ;
 -- USERS AND PRIVILEGES
 -- -----------------------------------------------------
 
-DROP USER IF EXISTS 'login';
+DROP USER IF EXISTS login;
 CREATE USER 'login' IDENTIFIED BY 'login';
 GRANT EXECUTE ON procedure `AgenziaViaggio`.`login` TO 'login';
 
-DROP USER IF EXISTS 'cliente';
+DROP USER IF EXISTS cliente;
 CREATE USER 'cliente' IDENTIFIED BY 'cliente';
 GRANT EXECUTE ON procedure `AgenziaViaggio`.`registraPrenotazione` TO 'cliente';
 GRANT EXECUTE ON procedure `AgenziaViaggio`.`cancellaPrenotazione` TO 'cliente';
 
-DROP USER IF EXISTS 'agente';
+DROP USER IF EXISTS agente;
 CREATE USER 'agente' IDENTIFIED BY 'agente';
 GRANT EXECUTE ON procedure `AgenziaViaggio`.`registraItinerario` TO 'agente';
 GRANT EXECUTE ON procedure `AgenziaViaggio`.`registraEdizioneViaggio` TO 'agente';
