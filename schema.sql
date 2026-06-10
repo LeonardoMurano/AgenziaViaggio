@@ -1469,38 +1469,13 @@ INSERT INTO EdizioneViaggioFutura VALUES
     -- ('2026-06-23','2026-06-30',0,4200,'RomaClassica'),
     -- ('2026-06-26','2026-07-03',0,3800,'LaghiNord'),
 
-    ('2026-07-01','2026-07-10',0,5000,'ItaliaNord'),
-    ('2026-07-05','2026-07-12',0,4800,'ItaliaSud'),
-    ('2026-07-10','2026-07-18',0,4200,'ArteToscana'),
-    ('2026-07-20','2026-07-28',0,3800,'CittaVenete'),
-    ('2026-08-01','2026-08-10',0,6000,'SiciliaTour'),
-    ('2026-08-05','2026-08-12',0,3000,'RomaClassica'),
-    ('2026-08-10','2026-08-18',0,4500,'Costiera'),
-    ('2026-08-15','2026-08-22',0,3500,'FoodTour'),
-    ('2026-08-20','2026-08-28',0,4200,'MareAdriatico'),
-    ('2026-09-01','2026-09-10',0,4200,'MareTirreno'),
-    ('2026-09-05','2026-09-15',0,7000,'Dolomiti'),
-    ('2026-09-10','2026-09-18',0,5500,'PugliaTour'),
-    ('2026-09-15','2026-09-22',0,4000,'EmiliaRomagna'),
-    ('2026-09-20','2026-09-30',0,9000,'GrandTourItalia');
+    ('2026-07-15','2026-07-22',0,5000,'ItaliaNord'),
+    ('2026-07-12','2026-07-19',0,4800,'ItaliaSud');
 
 INSERT INTO EdizioneViaggioPassata VALUES
-    ('2025-03-05','2025-03-15',55,7000,'Dolomiti'),
+    ('2025-03-05','2025-03-10',55,7000,'Dolomiti'),
     ('2025-02-05','2025-02-12',25,3000,'RomaClassica'),
-    ('2025-01-15','2025-01-22',45,4000,'LaghiNord'),
-
-    ('2025-01-01','2025-01-10',40,5000,'ItaliaNord'),
-    ('2025-01-05','2025-01-12',35,4800,'ItaliaSud'),
-    ('2025-01-10','2025-01-18',30,4200,'ArteToscana'),
-    ('2025-01-20','2025-01-28',38,3800,'CittaVenete'),
-    ('2025-02-01','2025-02-10',50,6000,'SiciliaTour'),
-    ('2025-02-10','2025-02-18',42,4500,'Costiera'),
-    ('2025-02-15','2025-02-22',28,3500,'FoodTour'),
-    ('2025-02-20','2025-02-28',33,4200,'MareAdriatico'),
-    ('2025-03-01','2025-03-10',31,4200,'MareTirreno'),
-    ('2025-03-10','2025-03-18',47,5500,'PugliaTour'),
-    ('2025-03-15','2025-03-22',39,4000,'EmiliaRomagna'),
-    ('2025-03-20','2025-03-30',50,9000,'GrandTourItalia');
+    ('2025-01-15','2025-01-22',45,4000,'LaghiNord');
 
 INSERT INTO TappaNotturna VALUES
     (1,2,'Dolomiti','Milano'),
@@ -1513,18 +1488,20 @@ INSERT INTO TappaNotturna VALUES
     (2,3,'LaghiNord','Verona'),
 
     (1,5,'ItaliaNord','Milano'),
-    (2,4,'ItaliaNord','Torino'),
+    (2,2,'ItaliaNord','Torino'),
+
     (1,7,'ItaliaSud','Napoli'),
-    (1,8,'ArteToscana','Firenze'),
-    (1,8,'CittaVenete','Venezia'),
-    (1,9,'SiciliaTour','Palermo'),
-    (1,8,'Costiera','Napoli'),
-    (1,7,'FoodTour','Parma'),
-    (1,8,'MareAdriatico','Bari'),
-    (1,9,'MareTirreno','Genova'),
-    (1,8,'PugliaTour','Lecce'),
+
+    (1,6,'ArteToscana','Firenze'),
+    (1,5,'CittaVenete','Venezia'),
+    (1,7,'SiciliaTour','Palermo'),
+    (1,7,'Costiera','Napoli'),
+    (1,4,'FoodTour','Parma'),
+    (1,3,'MareAdriatico','Bari'),
+    (1,5,'MareTirreno','Genova'),
+    (1,5,'PugliaTour','Lecce'),
     (1,7,'EmiliaRomagna','Bologna'),
-    (1,10,'GrandTourItalia','Roma');
+    (1,6,'GrandTourItalia','Roma');
 
 INSERT INTO Albergo VALUES
     ('Hotel Milano','Marco',100,100,'Via Roma 1','111','111','milano@h.it','Milano'),
@@ -1562,10 +1539,10 @@ VALUES
     -- (25,'srosa','2026-06-26','LaghiNord'),
     -- (30,'vverdi','2026-06-26','LaghiNord'),
 
-    (15,'vverdi','2026-07-01','ItaliaNord'),
-    (10,'dconti','2026-07-01','ItaliaNord'),
-    (5,'srosa','2026-07-01','ItaliaNord'),
-    (20,'tneri','2026-07-01','ItaliaNord');
+    (15,'vverdi','2026-07-15','ItaliaNord'),
+    (10,'dconti','2026-07-15','ItaliaNord'),
+    (5,'srosa','2026-07-15','ItaliaNord'),
+    (20,'tneri','2026-07-15','ItaliaNord');
 
 INSERT INTO Prenotazione (NumeroOspitiPrenotazione, InfoCliente, PartenzaP, ItinerarioP)
 VALUES
@@ -1580,41 +1557,15 @@ VALUES
     (10,'mrossi','2025-01-15','LaghiNord'),
     (5,'lbianchi','2025-01-15','LaghiNord'),
     (10,'gverdi','2025-01-15','LaghiNord'),
-    (10,'tneri','2025-01-15','LaghiNord'),
-
-    (40,'srosa','2025-01-01','ItaliaNord'),
-    (35,'lbianchi','2025-01-05','ItaliaSud'),
-    (30,'gverdi','2025-01-10','ArteToscana'),
-    (38,'dconti','2025-01-20','CittaVenete'),
-    (50,'srosa','2025-02-01','SiciliaTour'),
-    (42,'tneri','2025-02-10','Costiera'),
-    (28,'mrossi','2025-02-15','FoodTour'),
-    (33,'lbianchi','2025-02-20','MareAdriatico'),
-    (31,'gverdi','2025-03-01','MareTirreno'),
-    (47,'dconti','2025-03-10','PugliaTour'),
-    (39,'srosa','2025-03-15','EmiliaRomagna'),
-    (50,'vverdi','2025-03-20','GrandTourItalia');
+    (10,'tneri','2025-01-15','LaghiNord');
 
 INSERT INTO TramiteP VALUES
-    ('2025-01-01','ItaliaNord',1),
-    ('2025-01-05','ItaliaSud',2),
-    ('2025-01-10','ArteToscana',3),
     ('2025-01-15','LaghiNord',4),
-    ('2025-01-20','CittaVenete',5),
-    ('2025-02-01','SiciliaTour',12),
     ('2025-02-05','RomaClassica',7),
-    ('2025-02-10','Costiera',8),
-    ('2025-02-15','FoodTour',9),
-    ('2025-02-20','MareAdriatico',10),
-    ('2025-03-01','MareTirreno',11),
-    ('2025-03-05','Dolomiti',12),
-    ('2025-03-10','PugliaTour',13),
-    ('2025-03-15','EmiliaRomagna',14),
-    ('2025-03-20','GrandTourItalia',15);
+    ('2025-03-05','Dolomiti',12);
 
 -- INSERT INTO TramiteF VALUES
---   ('2026-06-20','Dolomiti',12),
-
+    -- ('2026-06-20','Dolomiti',12),
 
 INSERT INTO AlloggioP VALUES
     ('2025-03-05','Dolomiti',1,'Dolomiti','Hotel Milano','Milano'),
@@ -1624,24 +1575,11 @@ INSERT INTO AlloggioP VALUES
     ('2025-02-05','RomaClassica',1,'RomaClassica','Hotel Roma','Roma'),
 
     ('2025-01-15','LaghiNord',1,'LaghiNord','Hotel Venezia','Venezia'),
-    ('2025-01-15','LaghiNord',2,'LaghiNord','Hotel Verona','Verona'),
-
-    ('2025-01-01','ItaliaNord',1,'ItaliaNord','Hotel Milano','Milano'),
-    ('2025-01-01','ItaliaNord',2,'ItaliaNord','Hotel Torino','Torino'),
-    ('2025-01-05','ItaliaSud',1,'ItaliaSud','Hotel Napoli','Napoli'),
-    ('2025-01-10','ArteToscana',1,'ArteToscana','Hotel Firenze','Firenze'),
-    ('2025-01-20','CittaVenete',1,'CittaVenete','Hotel Venezia','Venezia'),
-    ('2025-02-01','SiciliaTour',1,'SiciliaTour','Hotel Palermo','Palermo'),
-    ('2025-02-10','Costiera',1,'Costiera','Hotel Napoli','Napoli'),
-    ('2025-02-15','FoodTour',1,'FoodTour','Hotel Parma','Parma'),
-    ('2025-02-20','MareAdriatico',1,'MareAdriatico','Hotel Bari','Bari'),
-    ('2025-03-01','MareTirreno',1,'MareTirreno','Hotel Genova','Genova'),
-    ('2025-03-10','PugliaTour',1,'PugliaTour','Hotel Lecce','Lecce'),
-    ('2025-03-15','EmiliaRomagna',1,'EmiliaRomagna','Hotel Bologna','Bologna');
+    ('2025-01-15','LaghiNord',2,'LaghiNord','Hotel Verona','Verona');
 
 -- INSERT INTO AlloggioF VALUES
---  ('2026-06-20','Dolomiti',1,'Dolomiti','Hotel Milano','Milano'),
---  ('2026-06-20','Dolomiti',2,'Dolomiti','Hotel Verona','Verona'),
---  ('2026-06-20','Dolomiti',3,'Dolomiti','Hotel Torino','Torino');
+    -- ('2026-06-20','Dolomiti',1,'Dolomiti','Hotel Milano','Milano'),
+    -- ('2026-06-20','Dolomiti',2,'Dolomiti','Hotel Verona','Verona'),
+    -- ('2026-06-20','Dolomiti',3,'Dolomiti','Hotel Torino','Torino');
 
 COMMIT;
