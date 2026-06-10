@@ -326,6 +326,9 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 -- -----------------------------------------------------
 -- stored procedure `AgenziaViaggio`.`login`
 -- -----------------------------------------------------
+
+DROP PROCEDURE IF EXISTS login;
+
 DELIMITER $$
 
 CREATE PROCEDURE login(
@@ -370,6 +373,8 @@ DELIMITER ;
 -- -----------------------------------------------------
 -- stored procedure `AgenziaViaggio`.`registraPrenotazione`
 -- -----------------------------------------------------
+
+DROP PROCEDURE IF EXISTS registraPrenotazione;
 
 DELIMITER $$
 
@@ -426,6 +431,8 @@ DELIMITER ;
 -- -----------------------------------------------------
 -- stored procedure `AgenziaViaggio`.`cancellaPrenotazione`
 -- -----------------------------------------------------
+
+DROP PROCEDURE IF EXISTS cancellaPrenotazione;
 
 DELIMITER $$
 
@@ -491,6 +498,8 @@ DELIMITER ;
 -- stored procedure `AgenziaViaggio`.`registraItinerario`
 -- -----------------------------------------------------
 
+DROP PROCEDURE IF EXISTS registraItinerario;
+
 DELIMITER $$
 
 CREATE PROCEDURE registraItinerario(
@@ -505,6 +514,7 @@ BEGIN
     DECLARE v_durata INT;
     DECLARE v_citta VARCHAR(100);
     DECLARE v_pos INT;
+    DECLARE v_durataTotale INT DEFAULT 0;
     DECLARE v_token TEXT;
 
 	-- gestione errori: se qualcosa fallisce -> rollback e resignal
@@ -560,6 +570,9 @@ BEGIN
 			-- prende l'ultimo segmento separato da ':'
 			SET v_citta  = SUBSTRING_INDEX(v_token, ':', -1);
 
+			-- aggiorna la durata totale dell'Itinerario
+			SET v_durataTotale = v_durataTotale + v_durata;
+
 			-- inserimento tappa i-esimaa estratta da input serializzato
             INSERT INTO TappaNotturna (
                 numero,
@@ -575,6 +588,14 @@ BEGIN
             );
         END WHILE;
 
+        -- verifica se 1 <= v_durataTotale <= 7
+        -- in caso negativo, tutti gli inserimenti effettuati vengono annullati
+        IF v_durataTotale < 1 OR v_durataTotale > 7 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT =
+                'La durata complessiva dell''itinerario deve essere compresa tra 1 e 7 giorni';
+        END IF;
+
     COMMIT;
 
 END $$
@@ -585,6 +606,8 @@ DELIMITER ;
 -- -----------------------------------------------------
 -- stored procedure `AgenziaViaggio`.`registraEdizioneViaggio`
 -- -----------------------------------------------------
+
+DROP PROCEDURE IF EXISTS registraEdizioneViaggio;
 
 DELIMITER $$
 
@@ -649,6 +672,8 @@ DELIMITER ;
 -- stored procedure `AgenziaViaggio`.`registraAlbergo`
 -- -----------------------------------------------------
 
+DROP PROCEDURE IF EXISTS registraAlbergo;
+
 DELIMITER $$
 
 CREATE PROCEDURE registraAlbergo(
@@ -697,6 +722,8 @@ DELIMITER ;
 -- stored procedure `AgenziaViaggio`.`registraAutobusAgenzia`
 -- -----------------------------------------------------
 
+DROP PROCEDURE IF EXISTS registraAutobusAgenzia;
+
 DELIMITER $$
 
 CREATE PROCEDURE registraAutobusAgenzia(
@@ -727,6 +754,8 @@ BEGIN
 -- -----------------------------------------------------
 -- stored procedure `AgenziaViaggio`.`associaAutobusAgenzia`
 -- -----------------------------------------------------
+
+DROP PROCEDURE IF EXISTS associaAutobusAgenzia;
 
 DELIMITER $$
 
@@ -788,6 +817,8 @@ DELIMITER ;
 -- stored procedure `AgenziaViaggio`.`associaAlbergo`
 -- -----------------------------------------------------
 
+DROP PROCEDURE IF EXISTS associaAlbergo;
+
 DELIMITER $$
 
 CREATE PROCEDURE associaAlbergo(
@@ -838,6 +869,8 @@ DELIMITER ;
 -- -----------------------------------------------------
 -- stored procedure `AgenziaViaggio`.`generaReport`
 -- -----------------------------------------------------
+
+DROP PROCEDURE IF EXISTS generaReport;
 
 DELIMITER $$
 
@@ -919,6 +952,9 @@ DELIMITER ;
 -- -----------------------------------------------------
 -- Trigger attivati da `AgenziaViaggio`.`registraPrenotazione`
 -- -----------------------------------------------------
+
+DROP TRIGGER IF EXISTS trg_check_prenotazione_data;
+
 DELIMITER $$
 
 CREATE TRIGGER trg_check_prenotazione_data
@@ -935,7 +971,10 @@ END IF;
 
 END $$
 
-DELIMITER;
+DELIMITER ;
+
+
+DROP TRIGGER IF EXISTS trg_update_ospiti_after_insert;
 
 DELIMITER $$
 
@@ -958,6 +997,8 @@ DELIMITER ;
 -- -----------------------------------------------------
 -- Triggers attivati da `AgenziaViaggio`.`cancellaPrenotazione`
 -- -----------------------------------------------------
+
+DROP TRIGGER IF EXISTS trg_check_delete_prenotazione;
 
 DELIMITER $$
 
@@ -983,6 +1024,9 @@ END $$
 
 DELIMITER ;
 
+
+DROP TRIGGER IF EXISTS trg_update_ospiti_after_delete;
+
 DELIMITER $$
 
 CREATE TRIGGER trg_update_ospiti_after_delete
@@ -1005,6 +1049,8 @@ DELIMITER ;
 -- Triggers attivati da `AgenziaViaggio`.`registraEdizioneViaggio`
 -- -----------------------------------------------------
 
+DROP TRIGGER IF EXISTS trg_check_data_partenza;
+
 DELIMITER $$
 
 CREATE TRIGGER trg_check_data_partenza
@@ -1026,6 +1072,8 @@ DELIMITER ;
 -- -----------------------------------------------------
 -- Trigger attivati da `AgenziaViaggio`.`associaAutobusAgenzia`
 -- -----------------------------------------------------
+
+DROP TRIGGER IF EXISTS trg_check_tramitef_inserimento;
 
 DELIMITER $$
 
@@ -1086,6 +1134,8 @@ DELIMITER ;
 -- -----------------------------------------------------
 -- Trigger attivati da `AgenziaViaggio`.`associaAlbergo`
 -- -----------------------------------------------------
+
+DROP TRIGGER IF EXISTS trg_check_alloggiof_inserimento;
 
 DELIMITER $$
 
@@ -1182,6 +1232,8 @@ SET GLOBAL event_scheduler = ON;
 -- -----------------------------------------------------
 -- event `AgenziaViaggio`.`spostaEdizioniPassate`
 -- -----------------------------------------------------
+
+DROP EVENT IF EXISTS spostaEdizioniPassate;
 
 DELIMITER $$
 
@@ -1340,6 +1392,8 @@ GRANT EXECUTE ON procedure `AgenziaViaggio`.`generaReport` TO 'agente';
 -- -----------------------------------------------------
 -- DEFAULT DATA FOR THE EXAMPLE PROGRAM
 -- -----------------------------------------------------
+
+START TRANSACTION;
 
 INSERT INTO Utente VALUES
     ('mrossi','Mario','Rossi','1234','Cliente'),
@@ -1589,3 +1643,5 @@ INSERT INTO AlloggioP VALUES
 --  ('2026-06-20','Dolomiti',1,'Dolomiti','Hotel Milano','Milano'),
 --  ('2026-06-20','Dolomiti',2,'Dolomiti','Hotel Verona','Verona'),
 --  ('2026-06-20','Dolomiti',3,'Dolomiti','Hotel Torino','Torino');
+
+COMMIT;
