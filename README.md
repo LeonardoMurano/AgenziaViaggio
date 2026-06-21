@@ -1,4 +1,4 @@
-# BASE DI DATI PER UN'AGENZIA DI VIAGGIO
+# 🌍BASE DI DATI PER UN'AGENZIA DI VIAGGIO
 ## ⚡FUNZIONALITA'
 Il software è il risultato del progetto universitario per l'esame Basi di dati dell'anno accademico 2025/26.
 
