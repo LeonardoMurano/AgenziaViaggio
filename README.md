@@ -49,6 +49,7 @@ A questo punto, il software è configurato e pronto ad essere utilizzato sul pro
 Dopo aver configurato il server utilizzato, è necessario istanziare il database sul proprio server. Per fare ciò è necessario:
 1. Aprire il package `AgenziaViaggio` ed il file `schema.sql` presente al suo interno.
 2. Mandare in esecuzione il file `schema.sql` sul proprio server: se non vengono riscontrati errori l'istanziazione è andata a buon fine, se vengono riscontrati errori è necessario verificare la compatibilità del file `schema.sql` con il proprio server utilizzato.
+
 In fondo al file `schema.sql` sono pre-inseriti dati di testing: è possibile (e consigliato) modificare quest'ultimi in base alle proprie esigenze, sostituendo alle ennuple di test, i record inerenti la propria agenzia di viaggio:
 - la terna `(username; password; ruolo)` di ogni nuovo utente registrato al sistema, deve essere obbligatoriamente inserita tramite modifica del file `schema.sql`, così come anche le varie città in cui possono svolgersi le tappe degli itinerari.
 - tutte le altre informazioni, invece, possono essere inserite anche direttamente utilizzando il software:per tale ragione, si consiglia di eliminare del tutto i dati pre-inseriti inerenti tali tabelle, per evitare l'involontaria violazione di vincoli di integrità dei dati.
