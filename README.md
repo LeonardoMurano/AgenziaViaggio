@@ -1,12 +1,12 @@
 # 🌍BASE DI DATI PER UN'AGENZIA DI VIAGGIO
-## ⚡FUNZIONALITA'
+## 🧳FUNZIONALITA'
 Il software è il risultato del progetto universitario per l'esame Basi di dati dell'anno accademico 2025/26.
 
-Il risultato è un database per un'agenzia di viaggio di dimensioni medie che mette a disposizione operazioni che consentono di manipolare le strutture dati del DB a proprio piacimento, garantendo che le modifiche apportate lascino i dati in uno stato consistente.
+Il risultato è un **database per un'agenzia di viaggio di dimensioni medie che mette a disposizione operazioni che consentono di manipolare le strutture dati del DB** a proprio piacimento, garantendo che le modifiche apportate lascino i dati in uno stato consistente.
 
 In particolare, viene offerto un meccanismo di autenticazione tramite credenziali `(username; password)`, da effettuare ad ogni avvio del software. Questo meccanismo consente l'autenticazione con due livelli di permessi diversi: *Cliente* o *Agente*.
 
-I permessi che ogni utente possiede sono direttamente associati alle sue credenziali: in questo modo, il software è utilizzabile sia da parte degli agenti che da parte dei clienti, ognuno con a disposizione diversi permessi coerenti al proprio ruolo.
+I permessi che ogni utente possiede sono direttamente associati alle sue credenziali: in questo modo, **il software è utilizzabile sia da parte degli agenti che da parte dei clienti**, ognuno con a disposizione diversi permessi coerenti al proprio ruolo.
 
 Di seguito sono riportate le funzionalità messe a disposizione rispettivamente per *Agenti* e *Clienti*:
 
@@ -23,7 +23,7 @@ Di seguito sono riportate le funzionalità messe a disposizione rispettivamente 
 |Cancellazione di una prenotazione|Cliente|
 
 Informazioni dettagliate sulle operazioni offerte e sui vincoli imposti per garantire la coerenza tra i dati sono riportate nella documentazione, accessibile tramite il link presente in fondo al documento.
-## 🚀WORKFLOW
+## 📍WORKFLOW
 La realizzazione del software è stata preceduta da un'attenta fase di progettazione, al fine di ottenere un sistema il più possibile completo, efficiente ed affidabile.
 
 Nel dettaglio, il software è stato realizzato nei seguenti steps:
@@ -40,9 +40,9 @@ Per utilizzare il software è necessario avere installato sul proprio computer i
 
 Il software è utilizzabile anche su altre tipologie di server (ma non viene garantito che tutte le operazioni risultino essere compatibili): in tal caso, per poter utilizzare il software è necessario modificare l'URL del server a cui connettersi:
 1. Aprire il package `AgenziaViaggio->Resources` ed il file `db.properties` presente al suo interno.
-2. Sostituire il valore associato alla proprietà `CONNECTION_VALUE` con l'url del proprio server.
+2. Sostituire il valore associato alla proprietà `CONNECTION_URL` con l'url del proprio server.
 ```properties
-CONNECTION_URL=<insert url>
+CONNECTION_URL=[insert_url]
 ```
 A questo punto, il software è configurato e pronto ad essere utilizzato sul proprio server.
 ### 🔐Istanziazione database
@@ -55,12 +55,12 @@ In fondo al file `schema.sql` sono pre-inseriti dati di testing: è possibile (e
 - tutte le altre informazioni, invece, possono essere inserite anche direttamente utilizzando il software:per tale ragione, si consiglia di eliminare del tutto i dati pre-inseriti inerenti tali tabelle, per evitare l'involontaria violazione di vincoli di integrità dei dati.
 
 Infine, si tenga a mente, che se si utilizzano server `MySQL 8.0.46`, per modificare i dati pre-inseriti è necessario rieseguire sul server il file `schema.sql`, con conseguente perdita di tutte le informazioni inserite tramite utilizzo del software: è quindi consigliato modificare i dati pre-inseriti solo quando strettamente necessario ed assicurarsi di avere un backup dello stato corrente del DB prima di effettuare tale operazione; in seguito a quest'ultima sarà necessario effettuare un merge delle informazioni pre-inserite in `schema.sql` con quelle inserite dagli utenti che utilizzando il software.
-### 🔥Esecuzione del software
+### ✈️Esecuzione del software
 Dopo aver configurato il server utilizzato ed aver istanziato il database, è possibile iniziare ad utilizzare il proprio database:
 1. Aprire il package `AgenziaViaggio->src->main` da un ide Java.
 2. Eseguire la funzione main.
 Se si presentano problemi, ricontrollare che `CONNECTION_URL` sia configurato correttamente e verificare che `schema.sql` sia stato eseguito correttamente sul proprio server.
-## 📦DOCUMENTAZIONE COMPLETA
+## 🗺️DOCUMENTAZIONE COMPLETA
 La documentazione completa del progetto è disponibile in formato pdf al seguente link:
 
 [Documentazione base di dati per un'agenzia di viaggio](https://uniroma2-my.sharepoint.com/:b:/g/personal/leonardo_murano_students_uniroma2_eu/IQBuWonU6XcrRKwVK8YNXk4oAdX8YOvb0bWvsx0CDE9CnUo?e=9NEz6i)
